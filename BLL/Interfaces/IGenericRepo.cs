@@ -1,19 +1,18 @@
 ﻿
 
+using Microsoft.AspNetCore.Mvc;
+
 namespace BLL.Interfaces
 {
     public interface IGenericRepo<T> where T : class
     {
 
-        Task AddAsync(T entity);
-        Task DeleteAsync(T entity);
+        Task AddAsync([FromBody]T entity);
+        Task DeleteAsync(int id); 
         Task<IEnumerable<T>> GetAllAsync();
         Task<T> GetByIdAsync(int id);
-        Task<T> UpdateAsync(T entity);
+        Task<T> UpdateAsync(int id, [FromBody]T entity);
         Task <IEnumerable<T>> GetAllActiveAsync();
-        Task SoftDeleteAsync(int id);
-
-
-
+        Task IsDeleted(T entity);
     }
 }

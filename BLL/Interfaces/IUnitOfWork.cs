@@ -2,9 +2,9 @@
 
 namespace BLL.Interfaces
 {
-    public interface IUnitOfWork 
+    public interface IUnitOfWork
     {
-        public IProductRepo ProductRepo { get; set; }
+        public IProductRepo ProductRepo { get; } void Save();
 
     }
 }

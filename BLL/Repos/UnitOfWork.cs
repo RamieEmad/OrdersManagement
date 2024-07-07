@@ -1,21 +1,22 @@
 ﻿using BLL.Interfaces;
-using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DAL.OrderManagementDBContext;
 
 namespace BLL.Repos
-{
+{    
     public class UnitOfWork : IUnitOfWork
     {
+        private readonly OrderManagementDBContext _context;
+        public IProductRepo ProductRepo { get; private set; }
+        
 
-        public IProductRepo ProductRepo {get;set;}
-
-        public UnitOfWork(IProductRepo productRepo)
+        public UnitOfWork(OrderManagementDBContext context, IProductRepo productRepo)
         {
+            _context = context;
             ProductRepo = productRepo;
         }
+
+        public void Save()
+           => _context.SaveChanges();
+        
     }
 }
