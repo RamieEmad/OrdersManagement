@@ -1,16 +1,14 @@
 ﻿using AutoMapper;
 using BLL.Interfaces;
-using PL.Mapping;
 using DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
 using PL.Models;
-using System.Reflection.Metadata.Ecma335;
-using System.Diagnostics.Eventing.Reader;
 
 namespace PL.Controllers
 {
     public class ProductController : Controller
     {
+        #region DI
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
@@ -19,6 +17,9 @@ namespace PL.Controllers
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
+        #endregion
+
+        #region CUD
 
         [HttpGet]
         public async Task<IActionResult> Add()
@@ -47,6 +48,21 @@ namespace PL.Controllers
             return View();
         }
 
+
+        [HttpPut]
+        public async Task<IActionResult> Update(int id, [FromBody] ProductViewModel productViewModel)
+        {
+            var x = _mapper.Map<Product>(productViewModel);
+            await _unitOfWork.ProductRepo.UpdateAsync(id, x);
+
+            return View();
+        }
+
+        #endregion
+
+        #region Read-GET
+
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductViewModel>>> GetAll()
         {
@@ -61,6 +77,7 @@ namespace PL.Controllers
                 return Ok(getAllProduct);
         }
 
+
         [HttpGet]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
@@ -68,33 +85,35 @@ namespace PL.Controllers
             return Ok(getByIdProduct);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> Update(int id, [FromBody] ProductViewModel productViewModel)
-        {
-            var x = _mapper.Map<Product>(productViewModel);
-            await _unitOfWork.ProductRepo.UpdateAsync(id, x);
-
-            return View();
-        }
 
 
-        public async Task<ActionResult<IEnumerable<ProductViewModel>>> IsActive()
+
+        public async Task<ActionResult<IEnumerable<ProductViewModel>>> GetAllIsActive() // Hold 4n
         {
             var isActiveProducts = await _unitOfWork.ProductRepo.GetAllActiveAsync();
             return Ok(isActiveProducts);
-           
+
+        }
+        #endregion
+
+        #region IS?
+        public async Task<bool> IsActive(int id)
+        {
+            bool isActiveProduct = await _unitOfWork.ProductRepo.IsActive(id);
+            return isActiveProduct;
         }
 
 
-        public async Task<IActionResult> SoftDelete(int id)
+        public async Task<bool> IsDeActive(int id)
         {
-            var getProductById = await _unitOfWork.ProductRepo.GetByIdAsync(id);
-            if (getProductById == null)
-                return NotFound();
+            bool isDeActiveProduct = await _unitOfWork.ProductRepo.IsDeActive(id);
+            return isDeActiveProduct;
+        }
 
-            await _unitOfWork.ProductRepo.IsDeleted(getProductById);
-            return RedirectToAction();
-            
+        public async Task<bool> IsDelete(int id)
+        {
+            var isDeletedProduct = await _unitOfWork.ProductRepo.IsDeleted(id);
+            return isDeletedProduct;
         }
 
 
@@ -103,5 +122,6 @@ namespace PL.Controllers
 
             return View();
         }
+        #endregion
     }
 }
