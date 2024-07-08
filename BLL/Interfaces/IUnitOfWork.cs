@@ -1,6 +1,4 @@
-﻿
-
-namespace BLL.Interfaces
+﻿namespace BLL.Interfaces
 {
     public interface IUnitOfWork
     {

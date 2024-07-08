@@ -1,12 +1,15 @@
 ﻿using BLL.Interfaces;
 using DAL.OrderManagementDBContext;
+using System.Globalization;
 
 namespace BLL.Repos
 {    
     public class UnitOfWork : IUnitOfWork
     {
+
         private readonly OrderManagementDBContext _context;
         public IProductRepo ProductRepo { get; private set; }
+        
         
 
         public UnitOfWork(OrderManagementDBContext context, IProductRepo productRepo)

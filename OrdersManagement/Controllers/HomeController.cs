@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using OrdersManagement.Models;
+using OrdersManagementDbContext.Models;
 using System.Diagnostics;
 
-namespace OrdersManagement.Controllers
+namespace OrdersManagementDbContext.Controllers
 {
     public class HomeController : Controller
     {

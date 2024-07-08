@@ -1,4 +1,4 @@
-﻿namespace OrdersManagement
+﻿namespace OrdersManagementDbContext
 {
     public class FileName
     {

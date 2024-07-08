@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace OrdersManagement
+namespace OrdersManagementDbContext
 {
     public class Program
     {
@@ -19,12 +19,19 @@ namespace OrdersManagement
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            builder.Services.AddScoped<IProductRepo, ProductRepo>();
+
+
+            builder.Services.AddScoped<OrderManagementDBContext>();
+
+
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IProductRepo, ProductRepo>();
+            builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
+            
             builder.Services.AddAutoMapper(map => map.AddProfile(new MappingProfile()));
 
 
-
+            
 
 
             var app = builder.Build();

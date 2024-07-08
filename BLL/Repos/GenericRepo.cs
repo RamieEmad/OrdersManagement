@@ -15,7 +15,7 @@ namespace BLL.Repos
     public class GenericRepo<T> : IGenericRepo<T> where T : BaseClass
     {
         private readonly OrderManagementDBContext _context;
-        public GenericRepo(OrderManagementDBContext context, IActionResultTypeMapper mapper)
+        public GenericRepo(OrderManagementDBContext context)
         {
             _context = context;
             
