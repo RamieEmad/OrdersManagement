@@ -13,12 +13,15 @@ namespace DAL.OrderManagementDBContext
         {
             var builder = WebApplication.CreateBuilder(args);
 
+
+
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
 
-
-            builder.Services.AddScoped<OrderManagementDBContext>();
+            builder.Services.AddDbContext<OrderManagementDBContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString
+                ("Server=.\\MSSQLLocalDB;Database=OrderManagementDBContext;Trusted_Connection=True;")));
 
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -26,10 +29,6 @@ namespace DAL.OrderManagementDBContext
             builder.Services.AddScoped<IProductCategoryRepo, ProductCategoryRepo>();
             
             builder.Services.AddAutoMapper(map => map.AddProfile(new MappingProfile()));
-
-
-            
-
 
             var app = builder.Build();
 

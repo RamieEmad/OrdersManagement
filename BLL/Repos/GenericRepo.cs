@@ -6,9 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.CodeDom;
-using System.Data.Entity;
 using System.Reflection.Metadata.Ecma335;
-using EntityState = System.Data.Entity.EntityState;
 
 namespace BLL.Repos
 {

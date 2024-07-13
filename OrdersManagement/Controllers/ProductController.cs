@@ -47,17 +47,6 @@ namespace PL.Controllers
                 await _unitOfWork.ProductRepo.AddAsync(productToAdd);
             }
 
-
-
-            //var productTasks = await _unitOfWork.ProductRepo.GetAllAsync();
-
-            //var productViewModel = productTasks.Select(c => new ProductCategoryViewModel
-            //{
-            //    id = c.productCategories.Id,
-            //    categoryName = c.productCategories.categoryName
-            //}).ToList();
-
-
             return View(productViewModel);
         }
 
