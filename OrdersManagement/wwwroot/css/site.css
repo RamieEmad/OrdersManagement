@@ -1,4 +1,4 @@
-html {
+/*html {
   font-size: 14px;
 }
 
@@ -20,3 +20,32 @@ html {
 body {
   margin-bottom: 60px;
 }
+*/
+
+link rel="stylesheet"
+
+<script >
+function toggleSidebar() {
+    var sidebar = document.querySelector('.sidebar');
+    var content = document.querySelector('.content');
+    if (sidebar.classList.contains('pinned'))
+
+{
+    sidebar .classList.remove('pinned');
+    sidebar .classList.add('unpinned');
+    content .classList.remove('pinned');
+}
+
+else {
+    sidebar .classList.remove('unpinned');
+    sidebar .classList.add('pinned');
+    content .classList.add('pinned');
+}
+
+
+</script >
+
+
+
+
+href="~/css/site.css" / > 

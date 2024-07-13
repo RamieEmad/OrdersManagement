@@ -20,8 +20,6 @@ namespace BLL.Repos
             _context = context;
             
         }
-
-
         public async Task AddAsync(T entity)
         {
             _context.Set<T>().Add(entity);

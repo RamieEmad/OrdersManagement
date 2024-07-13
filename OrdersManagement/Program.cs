@@ -1,14 +1,11 @@
-
 using BLL.Interfaces;
 using BLL.Repos;
-using DAL.Entities;
 using PL.Mapping;
 using DAL.OrderManagementDBContext;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace OrdersManagementDbContext
+namespace DAL.OrderManagementDBContext
 {
     public class Program
     {
@@ -26,7 +23,7 @@ namespace OrdersManagementDbContext
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IProductRepo, ProductRepo>();
-            builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
+            builder.Services.AddScoped<IProductCategoryRepo, ProductCategoryRepo>();
             
             builder.Services.AddAutoMapper(map => map.AddProfile(new MappingProfile()));
 

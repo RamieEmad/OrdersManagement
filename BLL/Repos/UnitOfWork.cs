@@ -9,13 +9,16 @@ namespace BLL.Repos
 
         private readonly OrderManagementDBContext _context;
         public IProductRepo ProductRepo { get; private set; }
-        
+        public IProductCategoryRepo ProductCategoryRepo { get; private set; }
         
 
-        public UnitOfWork(OrderManagementDBContext context, IProductRepo productRepo)
+        public UnitOfWork(OrderManagementDBContext context, IProductRepo productRepo,IProductCategoryRepo productCategoryRepo)
+
+        //#CTOR
         {
             _context = context;
             ProductRepo = productRepo;
+            ProductCategoryRepo = productCategoryRepo;
         }
 
         public void Save()

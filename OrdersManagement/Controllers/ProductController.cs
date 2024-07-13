@@ -3,6 +3,7 @@ using BLL.Interfaces;
 using DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
 using PL.Models;
+using System.Linq;
 
 namespace PL.Controllers
 {
@@ -22,12 +23,21 @@ namespace PL.Controllers
         #region CUD
 
         [HttpGet]
-        public async Task<IActionResult> Add()
+        public async Task<ActionResult<ProductViewModel>> Add()
         {
-            return View();
+            var products = await _unitOfWork.ProductRepo.GetAllAsync();
+            
+            var productCategories = products.Select(c => new ProductCategoryViewModel
+            {
+                id = c.productCategories.Id,
+                categoryName = c.productCategories.categoryName
+            }).ToList();
+
+            return new ProductViewModel { ProductCategoryViewModel = productCategories };
+
         }
 
-
+         
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] ProductViewModel productViewModel)
         {
@@ -37,7 +47,18 @@ namespace PL.Controllers
                 await _unitOfWork.ProductRepo.AddAsync(productToAdd);
             }
 
-            return RedirectToAction();
+
+
+            //var productTasks = await _unitOfWork.ProductRepo.GetAllAsync();
+
+            //var productViewModel = productTasks.Select(c => new ProductCategoryViewModel
+            //{
+            //    id = c.productCategories.Id,
+            //    categoryName = c.productCategories.categoryName
+            //}).ToList();
+
+
+            return View(productViewModel);
         }
 
         [HttpDelete]

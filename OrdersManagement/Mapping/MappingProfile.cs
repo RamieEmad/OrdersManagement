@@ -9,7 +9,7 @@ namespace PL.Mapping
         public MappingProfile() 
         {
             CreateMap<ProductViewModel, Product>().ReverseMap();
-            CreateMap<CategoryViewModel, CategoryViewModel>().ReverseMap();
+            CreateMap<ProductCategoryViewModel, ProductCategory>().ReverseMap();
         }
     }
 }

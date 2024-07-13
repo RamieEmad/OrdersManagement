@@ -1,12 +1,12 @@
 ﻿
 
+using DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BLL.Interfaces
 {
     public interface IGenericRepo<T> where T : class
     {
-
         Task AddAsync([FromBody]T entity);
         Task DeleteAsync(int id); 
 
