@@ -1,7 +1,6 @@
 using BLL.Interfaces;
 using BLL.Repos;
-using PL.Mapping;
-using DAL.OrderManagementDBContext;
+using PL.Mapping; 
 using Microsoft.EntityFrameworkCore;
 
 
@@ -13,15 +12,13 @@ namespace DAL.OrderManagementDBContext
         {
             var builder = WebApplication.CreateBuilder(args);
 
-
-
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
 
             builder.Services.AddDbContext<OrderManagementDBContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString
-                ("Server=.\\MSSQLLocalDB;Database=OrderManagementDBContext;Trusted_Connection=True;")));
+                ("Server=.\\SQLEXPRESS;Database=OrderManagementDBContext;Trusted_Connection=True; Encrypt=false;")));
 
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

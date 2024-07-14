@@ -10,7 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DAL.Migrations
 {
-    [Migration("20240713105234_InitFirst")]
+    [DbContext(typeof(OrderManagementDBContext.OrderManagementDBContext))]
+    [Migration("20240713134524_InitFirst")]
     partial class InitFirst
     {
         /// <inheritdoc />

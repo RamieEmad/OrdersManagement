@@ -17,9 +17,6 @@
             <link rel="stylesheet" href="~/css/site.css" />
 
 
-
-
-
             <form method="post">
                 <select asp-for="SelectedCategoryId" asp-items="@(new SelectList(Model.ProductCategoryViewModel, "id", "categoryName"))">
                     <option value="">Select a Category</option>
@@ -30,8 +27,10 @@
 
 
 
+
+
             <div class="form-group">
-                <label asp-for="prodName" class="control-label"></label>
+                <label asp-for="prodName" class="control-label">Product Name</label>
                 <input asp-for="prodName" class="form-control" />
                 <span asp-validation-for="prodName" class="text-danger"></span>
             </div>
@@ -39,7 +38,7 @@
 
 
             <div class="form-group">
-                <label asp-for="prodDesc" class="control-label"></label>
+                <label asp-for="prodDesc" class="control-label">Product Description</label>
                 <input asp-for="prodDesc" class="form-control" />
                 <span asp-validation-for="prodDesc" class="text-danger"></span>
             </div>
@@ -53,11 +52,13 @@
                     <input class="form-check-input" asp-for="IsDelete" /> @Html.DisplayNameFor(model => model.IsDelete)
                 </label>
             </div>
-            <div class="form-group">
+
+
+@*             <div class="form-group">
                 <label asp-for="SelectedCategoryId" class="control-label"></label>
                 <input asp-for="SelectedCategoryId" class="form-control" />
                 <span asp-validation-for="SelectedCategoryId" class="text-danger"></span>
-            </div>
+            </div> *@
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>

@@ -3,8 +3,6 @@ using BLL.Interfaces;
 using DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
 using PL.Models;
-using System.Linq;
-
 namespace PL.Controllers
 {
     public class ProductController : Controller
@@ -33,7 +31,7 @@ namespace PL.Controllers
                 categoryName = c.productCategories.categoryName
             }).ToList();
 
-            return new ProductViewModel { ProductCategoryViewModel = productCategories };
+            return View(new ProductViewModel { ProductCategoryViewModel = productCategories });
 
         }
 

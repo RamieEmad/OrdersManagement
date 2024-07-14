@@ -37,7 +37,10 @@ namespace BLL.Repos
 
 
         public async Task <IEnumerable<T>> GetAllAsync()
-            => await _context.Set<T>().ToListAsync();
+        { 
+            return await _context.Set<T>().ToListAsync(); 
+        }
+             
 
 
         public async Task<T> GetByIdAsync(int id)
