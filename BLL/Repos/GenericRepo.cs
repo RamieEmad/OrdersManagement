@@ -1,12 +1,8 @@
 ﻿using BLL.Interfaces;
 using DAL.Entities;
 using DAL.OrderManagementDBContext;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using System.CodeDom;
-using System.Reflection.Metadata.Ecma335;
+
 
 namespace BLL.Repos
 {
@@ -16,14 +12,13 @@ namespace BLL.Repos
         public GenericRepo(OrderManagementDBContext context)
         {
             _context = context;
-            
+
         }
         public async Task AddAsync(T entity)
         {
             _context.Set<T>().Add(entity);
             await _context.SaveChangesAsync();
         }
-
 
         public async Task DeleteAsync(int id)
         {
@@ -36,11 +31,11 @@ namespace BLL.Repos
         }
 
 
-        public async Task <IEnumerable<T>> GetAllAsync()
-        { 
-            return await _context.Set<T>().ToListAsync(); 
+        public async Task<IEnumerable<T>> GetAllAsync()
+        {
+            return await _context.Set<T>().ToListAsync();
         }
-             
+
 
 
         public async Task<T> GetByIdAsync(int id)
@@ -63,14 +58,14 @@ namespace BLL.Repos
 
             else
                 _context.Entry(entity).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
-                      return entity;
+            await _context.SaveChangesAsync();
+            return entity;
         }
 
 
         public async Task<IEnumerable<T>> GetAllActiveAsync() // Hold 4n
         {
-           var isActiveProducts = await _context.Set<T>().Where(x => !x.IsDeleted && x.IsActive).ToListAsync();
+            var isActiveProducts = await _context.Set<T>().Where(x => !x.IsDeleted && x.IsActive).ToListAsync();
 
             if (isActiveProducts == null)
                 throw new Exception(nameof(isActiveProducts));
@@ -83,11 +78,11 @@ namespace BLL.Repos
             var findProductToActive = await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
 
             if (findProductToActive == null)
-             throw new Exception(nameof(findProductToActive));
+                throw new Exception(nameof(findProductToActive));
 
-            
+
             findProductToActive.IsActive = true;
-             await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return true;
 
@@ -120,7 +115,12 @@ namespace BLL.Repos
 
             return false;
         }
-        
+        //public IEnumerable<Product> GetAll(Product entity)
+        //{
+        //    var x = _context.Set<Product>().ToList();
+        //    return x;
 
+
+        //}
     }
 }

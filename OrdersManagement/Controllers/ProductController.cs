@@ -3,6 +3,7 @@ using BLL.Interfaces;
 using DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
 using PL.Models;
+
 namespace PL.Controllers
 {
     public class ProductController : Controller
@@ -10,11 +11,13 @@ namespace PL.Controllers
         #region DI
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IGenericRepo<ProductCategory> _genericRepo;
 
-        public ProductController(IUnitOfWork unitOfWork, IMapper mapper)
+        public ProductController(IUnitOfWork unitOfWork, IMapper mapper, IGenericRepo<ProductCategory> genericRepo)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _genericRepo = genericRepo;
         }
         #endregion
 
@@ -23,29 +26,35 @@ namespace PL.Controllers
         [HttpGet]
         public async Task<ActionResult<ProductViewModel>> Add()
         {
-            var products = await _unitOfWork.ProductRepo.GetAllAsync();
-            
-            var productCategories = products.Select(c => new ProductCategoryViewModel
+
+            var categories = await _genericRepo.GetAllAsync();
+
+            //Get the Categories Seperated not with the product
+            var product = new ProductViewModel
             {
-                id = c.productCategories.Id,
-                categoryName = c.productCategories.categoryName
-            }).ToList();
+                ProductCategories = categories.Select(x => new ProductCategoryViewModel
+                {
+                    id = x.Id,
+                    categoryName = x.categoryName
+                }
+            )
+            };
 
-            return View(new ProductViewModel { ProductCategoryViewModel = productCategories });
-
+            return View(product);
         }
 
-         
+
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] ProductViewModel productViewModel)
+        public async Task<IActionResult> Add([FromForm] ProductViewModel productViewModel)
         {
             if (ModelState.IsValid)
             {
+
                 var productToAdd = _mapper.Map<Product>(productViewModel); // Map Entity : It's ViewModel
                 await _unitOfWork.ProductRepo.AddAsync(productToAdd);
             }
 
-            return View(productViewModel);
+            return RedirectToAction("Privacy", "Home");
         }
 
         [HttpDelete]
@@ -72,17 +81,19 @@ namespace PL.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductViewModel>>> GetAll()
+        public async Task<ActionResult<IEnumerable<ProductViewModel>>> List()
         {
-            var getAllProduct = await _unitOfWork.ProductRepo.GetAllAsync();
 
-            if (getAllProduct == null)
+            var getAllProduct = await _genericRepo.GetAllAsync();
+            var productViewModels = _mapper.Map<IEnumerable<ProductViewModel>>(getAllProduct);
+
+            if (productViewModels == null)
             {
                 return NotFound();
             }
 
             else
-                return Ok(getAllProduct);
+                return View();
         }
 
 
@@ -90,16 +101,27 @@ namespace PL.Controllers
         public async Task<IActionResult> GetByIdAsync(int id)
         {
             var getByIdProduct = await _unitOfWork.ProductRepo.GetByIdAsync(id);
-            return Ok(getByIdProduct);
+            var productViewModels = _mapper.Map<ProductViewModel>(getByIdProduct);
+
+            if (productViewModels == null)
+            { 
+                return NotFound(); 
+            }
+
+            return View();
         }
-
-
 
 
         public async Task<ActionResult<IEnumerable<ProductViewModel>>> GetAllIsActive() // Hold 4n
         {
             var isActiveProducts = await _unitOfWork.ProductRepo.GetAllActiveAsync();
-            return Ok(isActiveProducts);
+            var productViewModel = _mapper.Map<ProductViewModel>(isActiveProducts);
+
+            if (productViewModel == null)
+            {
+                return NotFound();
+            }
+            return View();
 
         }
         #endregion
@@ -131,5 +153,6 @@ namespace PL.Controllers
             return View();
         }
         #endregion
+
     }
 }

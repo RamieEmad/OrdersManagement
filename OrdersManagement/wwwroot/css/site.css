@@ -22,9 +22,7 @@ body {
 }
 */
 
-link rel="stylesheet"
 
-<script >
 function toggleSidebar() {
     var sidebar = document.querySelector('.sidebar');
     var content = document.querySelector('.content');
@@ -43,9 +41,3 @@ else {
 }
 
 
-</script >
-
-
-
-
-href="~/css/site.css" / > 

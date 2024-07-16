@@ -8,25 +8,20 @@
 
 <h4>ProductViewModel</h4>
 <hr />
+
 <div class="row">
+
     <div class="col-md-4">
         <form asp-action="Add">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            @await Html.PartialAsync("_Add")
-            <link rel="stylesheet" href="~/css/site.css" />
 
-
-            <form method="post">
-                <select asp-for="SelectedCategoryId" asp-items="@(new SelectList(Model.ProductCategoryViewModel, "id", "categoryName"))">
-                    <option value="">Select a Category</option>
+            
+            <div>
+                <select asp-for="ProductCategoryId" asp-items="@(new SelectList(Model.ProductCategories, "id", "categoryName"))">
+                    <option value="1">Select a Category</option>
                 </select>
-
-                <button type="submit">Add Product</button>
-            </form>
-
-
-
+            </div>
 
 
             <div class="form-group">
@@ -42,11 +37,15 @@
                 <input asp-for="prodDesc" class="form-control" />
                 <span asp-validation-for="prodDesc" class="text-danger"></span>
             </div>
+
+
             <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
                 </label>
             </div>
+
+
             <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="IsDelete" /> @Html.DisplayNameFor(model => model.IsDelete)
@@ -54,20 +53,23 @@
             </div>
 
 
-@*             <div class="form-group">
-                <label asp-for="SelectedCategoryId" class="control-label"></label>
-                <input asp-for="SelectedCategoryId" class="form-control" />
-                <span asp-validation-for="SelectedCategoryId" class="text-danger"></span>
-            </div> *@
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Add" class="btn btn-primary" />
             </div>
+
+
         </form>
+
+
+
+
     </div>
+
+
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" asp-controller="Home">Back to List</a>
 </div>
 
 @section Scripts {

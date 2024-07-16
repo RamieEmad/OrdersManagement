@@ -19,5 +19,15 @@ namespace DAL.OrderManagementDBContext
             base.OnConfiguring(optionsBuilder);
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.ProductCategory) // Each Product has one ProductCategory
+                .WithMany(pc => pc.Products)   // Each ProductCategory can have many Products
+                .HasForeignKey(p => p.ProductCategoryId); // Foreign key configuration
+        }
+
+
     }
 }

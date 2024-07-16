@@ -12,6 +12,12 @@ namespace BLL.Repos
         {
             _context = context;
         }
+
+        public IEnumerable<Product> GetAll()
+        {
+            return _context.Set<Product>().ToList();
+        }
+
     }
 
 }

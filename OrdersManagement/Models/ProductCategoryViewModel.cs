@@ -4,9 +4,9 @@ namespace PL.Models
 {
     public class ProductCategoryViewModel 
     {
-        public int id { get; set; } 
+        public int id{ get; set; }
         public string categoryName { get; set; }
         public string categoryDesc { get; set; }
-        public IEnumerable<ProductViewModel> ProductsViewModel{ get; set;}
+        public IEnumerable<Product> Products { get; set; }
     }
 }

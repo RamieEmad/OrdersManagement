@@ -24,7 +24,8 @@ namespace DAL.OrderManagementDBContext
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IProductRepo, ProductRepo>();
             builder.Services.AddScoped<IProductCategoryRepo, ProductCategoryRepo>();
-            
+            builder.Services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
+
             builder.Services.AddAutoMapper(map => map.AddProfile(new MappingProfile()));
 
             var app = builder.Build();
