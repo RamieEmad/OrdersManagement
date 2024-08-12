@@ -1,0 +1,74 @@
+﻿@model IEnumerable<PL.Models.ProductViewModel>
+
+@{
+    ViewData["Title"] = "List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h1>List</h1>
+
+<p>
+    <a asp-controller="Product" asp-action="Add">Create New</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.prodName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.prodDesc)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductCategory.categoryDesc)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsDeleted)
+            </th>
+@*             <th>
+                @Html.DisplayNameFor(model => model.IsActive)
+            </th> *@
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.prodName)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.prodDesc)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductCategory.categoryDesc)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsDeleted)
+                </td>
+
+@*                 <td>
+                    @Html.DisplayFor(modelItem => item.IsActive)
+                </td> *@
+
+
+                <td>
+                    <a asp-action="Update" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
+                    <a asp-action="ToggleIsActive" asp-route-id="@item.Id">@(item.IsActive ? "Active" : "InActive")</a>
+                </td> 
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="~/js/ToggleActive.js"></script>
+    }

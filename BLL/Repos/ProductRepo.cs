@@ -1,7 +1,7 @@
-﻿
-using BLL.Interfaces;
+﻿using BLL.Interfaces;
 using DAL.Entities;
 using DAL.OrderManagementDBContext;
+using Microsoft.EntityFrameworkCore;
 
 namespace BLL.Repos
 {
@@ -13,11 +13,10 @@ namespace BLL.Repos
             _context = context;
         }
 
-        public IEnumerable<Product> GetAll()
+        public  IEnumerable<Product> GetAllProductWithCategory()
         {
-            return _context.Set<Product>().ToList();
+            return  _context.Products.Include(p => p.ProductCategory).ToList();
+   
         }
-
     }
-
 }

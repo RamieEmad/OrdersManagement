@@ -1,28 +1,37 @@
 ﻿using BLL.Interfaces;
 using DAL.Entities;
 using DAL.OrderManagementDBContext;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 
 namespace BLL.Repos
 {
+       
     public class GenericRepo<T> : IGenericRepo<T> where T : BaseClass
     {
+       #region GenericRepo
         private readonly OrderManagementDBContext _context;
         public GenericRepo(OrderManagementDBContext context)
         {
             _context = context;
 
         }
-        public async Task AddAsync(T entity)
+        #endregion
+
+       #region CRUD
+        //Adding
+        public async Task AddAsync([FromForm]T entity)
         {
             _context.Set<T>().Add(entity);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+
+        //Deleting
+        public async Task DeleteAsync (int id)
         {
-            var entityToDelete = await _context.Set<T>().FindAsync(id); // Create entityToDelete to check availability
+            var entityToDelete = await _context.Set<T>().FindAsync(id);
             if (entityToDelete != null)
             {
                 _context.Set<T>().Remove(entityToDelete);
@@ -30,13 +39,23 @@ namespace BLL.Repos
             }
         }
 
+        //Updating
+        public async Task<T> UpdateAsync(T entity)
+        {
+            _context.Entry(entity).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return entity;
+        }
+
+        #endregion
+
+       #region Get-Funs
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _context.Set<T>().ToListAsync();
         }
-
-
+  
 
         public async Task<T> GetByIdAsync(int id)
         {
@@ -49,19 +68,6 @@ namespace BLL.Repos
             return productById;
         }
 
-        public async Task<T> UpdateAsync(int id, T entity)
-        {
-            var updateProductById = await _context.Set<T>().FindAsync(id);
-
-            if (updateProductById == null)
-                throw new ArgumentNullException(nameof(entity));
-
-            else
-                _context.Entry(entity).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return entity;
-        }
-
 
         public async Task<IEnumerable<T>> GetAllActiveAsync() // Hold 4n
         {
@@ -72,6 +78,21 @@ namespace BLL.Repos
             else
                 return isActiveProducts;
         }
+
+
+        #endregion
+
+        #region IS?
+        public void ToggleActiveAsync(int id)
+        {
+            var product = _context.Products.Find(id);
+            if (product != null)
+            {
+                product.IsActive = !product.IsActive;
+                _context.SaveChanges();
+            }
+        }
+
 
         public async Task<bool> IsActive(int id)
         {
@@ -87,6 +108,7 @@ namespace BLL.Repos
             return true;
 
         }
+
 
         public async Task<bool> IsDeActive(int id)
         {
@@ -115,12 +137,9 @@ namespace BLL.Repos
 
             return false;
         }
-        //public IEnumerable<Product> GetAll(Product entity)
-        //{
-        //    var x = _context.Set<Product>().ToList();
-        //    return x;
 
+        #endregion
 
-        //}
+ 
     }
 }

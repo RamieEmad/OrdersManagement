@@ -6,11 +6,10 @@ namespace BLL.Repos
 {    
     public class UnitOfWork : IUnitOfWork
     {
-
         private readonly OrderManagementDBContext _context;
+
         public IProductRepo ProductRepo { get; private set; }
         public IProductCategoryRepo ProductCategoryRepo { get; private set; }
-        
 
         public UnitOfWork(OrderManagementDBContext context, IProductRepo productRepo,IProductCategoryRepo productCategoryRepo)
 

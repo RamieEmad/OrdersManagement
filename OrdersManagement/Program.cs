@@ -15,12 +15,11 @@ namespace DAL.OrderManagementDBContext
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-
             builder.Services.AddDbContext<OrderManagementDBContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString
                 ("Server=.\\SQLEXPRESS;Database=OrderManagementDBContext;Trusted_Connection=True; Encrypt=false;")));
 
-
+            //builder.Services.AddDbContext<OrderManagementDBContext>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IProductRepo, ProductRepo>();
             builder.Services.AddScoped<IProductCategoryRepo, ProductCategoryRepo>();

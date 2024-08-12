@@ -11,80 +11,162 @@ namespace PL.Controllers
         #region DI
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly IGenericRepo<ProductCategory> _genericRepo;
+        private readonly ILogger<ProductController> _logger;
+        private readonly IGenericRepo<ProductCategory> _generiCategory;
+        private readonly IGenericRepo<Product> _genericProduct;
 
-        public ProductController(IUnitOfWork unitOfWork, IMapper mapper, IGenericRepo<ProductCategory> genericRepo)
+        public ProductController
+            (IUnitOfWork unitOfWork,
+            IMapper mapper,
+            IGenericRepo<ProductCategory> genericRepo,
+            ILogger<ProductController> logger,
+            IGenericRepo<Product> productRepo)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _genericRepo = genericRepo;
+            _generiCategory = genericRepo;
+            _logger = logger;
+            _genericProduct = productRepo; 
         }
+
         #endregion
 
         #region CUD
 
+        #region Create
         [HttpGet]
-        public async Task<ActionResult<ProductViewModel>> Add()
+        public async Task<ActionResult> Add()
         {
-
-            var categories = await _genericRepo.GetAllAsync();
-
-            //Get the Categories Seperated not with the product
-            var product = new ProductViewModel
+            var categories = await _generiCategory.GetAllAsync();
+            
+            if (categories == null)
+            {
+                return NotFound();
+            }
+            
+           // Get the Categories Seperated from => Product.Categories
+            var productViewModel = new ProductViewModel
             {
                 ProductCategories = categories.Select(x => new ProductCategoryViewModel
                 {
-                    id = x.Id,
-                    categoryName = x.categoryName
+                    Id = x.Id,
+                    categoryName = x.categoryName,
                 }
             )
             };
 
-            return View(product);
+            return View(productViewModel);
         }
 
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromForm] ProductViewModel productViewModel)
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Add(ProductViewModel productViewModel)
         {
-            if (ModelState.IsValid)
+            if (productViewModel == null)
             {
-
-                var productToAdd = _mapper.Map<Product>(productViewModel); // Map Entity : It's ViewModel
-                await _unitOfWork.ProductRepo.AddAsync(productToAdd);
+                return NotFound();
             }
 
-            return RedirectToAction("Privacy", "Home");
-        }
+            var product = new Product
+            {
+                prodName = productViewModel.prodName,
+                prodDesc = productViewModel.prodDesc,
+                ProductCategoryId = productViewModel.ProductCategoryId,
+                IsActive = productViewModel.IsActive,
+                IsDeleted = productViewModel.IsDeleted
+            };
 
-        [HttpDelete]
+                var productToAdd = _mapper.Map<Product>(product);
+                await _genericProduct.AddAsync(productToAdd);
+
+                return RedirectToAction(nameof(List));
+        }
+        #endregion
+
+        #region Delete
+        [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
-            // Already checked " if not null "
-            await _unitOfWork.ProductRepo.DeleteAsync(id);
-            return View();
+            var getByIdProduct = await _genericProduct.GetByIdAsync(id);
+            var productViewModel = _mapper.Map<ProductViewModel>(getByIdProduct);
+            return View(productViewModel);
         }
 
-
-        [HttpPut]
-        public async Task<IActionResult> Update(int id, [FromBody] ProductViewModel productViewModel)
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id, [FromForm] ProductViewModel productViewModel)
         {
-            var x = _mapper.Map<Product>(productViewModel);
-            await _unitOfWork.ProductRepo.UpdateAsync(id, x);
+            if (id == productViewModel.Id)
+            {
+                var productDeleteconfirmed = await _genericProduct.GetByIdAsync(id);
+                var viewModel = _mapper.Map<Product>(productDeleteconfirmed);
 
-            return View();
+                // Already checked " if not null "
+                await _genericProduct.DeleteAsync(viewModel.Id);
+                
+            }
+            return RedirectToAction(nameof(List));
         }
 
         #endregion
 
-        #region Read-GET
-
+        #region Update
+        //Get/ProductById/ToUpdate
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductViewModel>>> List()
+        public async Task<IActionResult> Update(int id)
         {
+            var getByIdProduct = await _genericProduct.GetByIdAsync(id);
 
-            var getAllProduct = await _genericRepo.GetAllAsync();
+            if (getByIdProduct == null)
+            {
+                return NotFound();
+            }
+
+            var getProductByIdViewModel = _mapper.Map<ProductViewModel>(getByIdProduct);
+            return View(getProductByIdViewModel);
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update(int id, [FromForm] ProductViewModel viewModel)
+        {
+            if (id != viewModel.Id)
+            {
+                return BadRequest("Invalid product id");
+            }
+
+            var product = await _genericProduct.GetByIdAsync(id);
+
+            if (product == null)
+            {
+                return NotFound("Product not found");
+            }
+
+            var updatedProduct = _mapper.Map(viewModel, product);
+            await _genericProduct.UpdateAsync(updatedProduct);
+
+            return RedirectToAction("List");
+        }
+
+        #endregion
+
+        #region Details
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var getByIdProduct = await _genericProduct.GetByIdAsync(id);
+            var productViewModel = _mapper.Map<ProductViewModel>(getByIdProduct);
+            return View(productViewModel);
+        }
+        #endregion
+
+        #region Read-GET
+        [HttpGet]
+        public ActionResult List()
+        {
+            var getAllProduct = _unitOfWork.ProductRepo.GetAllProductWithCategory();
             var productViewModels = _mapper.Map<IEnumerable<ProductViewModel>>(getAllProduct);
 
             if (productViewModels == null)
@@ -92,20 +174,18 @@ namespace PL.Controllers
                 return NotFound();
             }
 
-            else
-                return View();
+            return View(productViewModels);
         }
-
 
         [HttpGet]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var getByIdProduct = await _unitOfWork.ProductRepo.GetByIdAsync(id);
-            var productViewModels = _mapper.Map<ProductViewModel>(getByIdProduct);
+            var getByIdProduct = await _genericProduct.GetByIdAsync(id);
+            var productViewModels = _mapper.Map<IEnumerable<ProductViewModel>>(getByIdProduct);
 
             if (productViewModels == null)
-            { 
-                return NotFound(); 
+            {
+                return NotFound();
             }
 
             return View();
@@ -114,7 +194,7 @@ namespace PL.Controllers
 
         public async Task<ActionResult<IEnumerable<ProductViewModel>>> GetAllIsActive() // Hold 4n
         {
-            var isActiveProducts = await _unitOfWork.ProductRepo.GetAllActiveAsync();
+            var isActiveProducts = await _genericProduct.GetAllActiveAsync();
             var productViewModel = _mapper.Map<ProductViewModel>(isActiveProducts);
 
             if (productViewModel == null)
@@ -127,32 +207,39 @@ namespace PL.Controllers
         #endregion
 
         #region IS?
+        [HttpPost]
+        public IActionResult ToggleIsActive(int id)
+        {
+            _genericProduct.ToggleActiveAsync(id);
+            return RedirectToAction("List");
+        }
+
+
         public async Task<bool> IsActive(int id)
         {
-            bool isActiveProduct = await _unitOfWork.ProductRepo.IsActive(id);
+            bool isActiveProduct = await _genericProduct.IsActive(id);
             return isActiveProduct;
         }
 
 
         public async Task<bool> IsDeActive(int id)
         {
-            bool isDeActiveProduct = await _unitOfWork.ProductRepo.IsDeActive(id);
+            bool isDeActiveProduct = await _genericProduct.IsDeActive(id);
+            
             return isDeActiveProduct;
         }
 
+
         public async Task<bool> IsDelete(int id)
         {
-            var isDeletedProduct = await _unitOfWork.ProductRepo.IsDeleted(id);
+            var isDeletedProduct = await _genericProduct.IsDeleted(id);
             return isDeletedProduct;
+            
         }
 
-
-        public IActionResult Index()
-        {
-
-            return View();
-        }
         #endregion
 
+
+        #endregion
     }
 }

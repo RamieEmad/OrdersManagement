@@ -1,0 +1,106 @@
+﻿@model PL.Models.ProductViewModel
+
+@{
+    ViewData["Title"] = "Update";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Update</h1>
+<hr />
+
+
+<div class="row">
+    <div class="col-md-4">
+
+        <form asp-action="Update">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ProductCategoryId" />
+
+
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+
+                <label asp-for="prodName" class="control-label">Product Name</label>
+                <input asp-for="prodName" class="form-control" />
+                <span asp-validation-for="prodName" class="text-danger"></span>
+            </div>
+
+
+
+            <div class="form-group">
+                <label asp-for="prodDesc" class="control-label">Product Description</label>
+                <input asp-for="prodDesc" class="form-control" />
+                <span asp-validation-for="prodDesc" class="text-danger"></span>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+
+
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsDeleted"  />
+                        @Html.DisplayNameFor(model => model.IsDeleted)
+                </label>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsActive" />
+                        @Html.DisplayNameFor(model => model.IsActive)
+                </label>
+            </div>
+
+            
+
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="List">Back to List</a>
+</div>
+
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }

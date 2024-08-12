@@ -4,6 +4,6 @@ namespace BLL.Interfaces
 {
     public interface IProductRepo : IGenericRepo<Product>
     {
-        IEnumerable<Product> GetAll();
+        IEnumerable<Product> GetAllProductWithCategory();
     }
 }

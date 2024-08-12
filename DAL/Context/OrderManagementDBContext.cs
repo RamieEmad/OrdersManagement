@@ -1,5 +1,6 @@
 ﻿using DAL.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 
 
 
@@ -21,13 +22,23 @@ namespace DAL.OrderManagementDBContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
             modelBuilder.Entity<Product>()
-                .HasOne(p => p.ProductCategory) // Each Product has one ProductCategory
-                .WithMany(pc => pc.Products)   // Each ProductCategory can have many Products
-                .HasForeignKey(p => p.ProductCategoryId); // Foreign key configuration
+                .HasOne(p => p.ProductCategory)
+
+                .WithMany(pc => pc.Products)   
+
+                .HasForeignKey(p => p.ProductCategoryId);
         }
+    }
 
+    public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<OrderManagementDBContext>
+    {
+        public OrderManagementDBContext CreateDbContext(string[] args)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<OrderManagementDBContext>();
+            optionsBuilder.UseSqlServer(@"Server=.\SQLEXPRESS;Database=OrderManagementDBContext;Trusted_Connection=True; Encrypt=false;");
 
+            return new OrderManagementDBContext(optionsBuilder.Options);
+        }
     }
 }
