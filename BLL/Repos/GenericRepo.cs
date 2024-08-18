@@ -82,7 +82,7 @@ namespace BLL.Repos
 
         #endregion
 
-        #region IS?
+       #region IS?
         public void ToggleActiveAsync(int id)
         {
             var product = _context.Products.Find(id);
@@ -92,6 +92,7 @@ namespace BLL.Repos
                 _context.SaveChanges();
             }
         }
+
 
 
         public async Task<bool> IsActive(int id)

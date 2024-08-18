@@ -13,6 +13,7 @@
 <table class="table">
     <thead>
         <tr>
+
             <th>
                 @Html.DisplayNameFor(model => model.prodName)
             </th>
@@ -25,17 +26,19 @@
             <th>
                 @Html.DisplayNameFor(model => model.IsDeleted)
             </th>
-@*             <th>
+            <th>
                 @Html.DisplayNameFor(model => model.IsActive)
-            </th> *@
+            </th>
             <th></th>
         </tr>
     </thead>
+
     <tbody>
 
         @foreach (var item in Model)
         {
             <tr>
+         
                 <td>
                     @Html.DisplayFor(modelItem => item.prodName)
                 </td>
@@ -52,23 +55,30 @@
                     @Html.DisplayFor(modelItem => item.IsDeleted)
                 </td>
 
-@*                 <td>
-                    @Html.DisplayFor(modelItem => item.IsActive)
-                </td> *@
-
-
                 <td>
-                    <a asp-action="Update" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
-                    <a asp-action="ToggleIsActive" asp-route-id="@item.Id">@(item.IsActive ? "Active" : "InActive")</a>
+                    @Html.DisplayFor(modelItem => item.IsActive)
+                </td>
+
+              
+                <td>
+
+                    <a class="btn btn-primary" asp-action="Update" asp-route-id="@item.Id">Edit</a>
+                    <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.Id">Details</a> 
+                    <a class="btn btn-primary" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a 
+                        onclick="toggleActivation(this,'@Url.Action("ToggleActive", "Product")')"
+                        data-product-id="@item.Id"
+                        class="btn @(item.IsActive ? "btn-success" : "btn-danger")">
+                        @(item.IsActive ? "Active" : "Inactive")
+                    </a>
+
                 </td> 
             </tr>
         }
+        @section Scripts {<script src="~/js/ToggleActive.js"></script>}
+
 
     </tbody>
 </table>
 
-@section Scripts {
-    <script src="~/js/ToggleActive.js"></script>
-    }
+

@@ -18,5 +18,17 @@ namespace BLL.Repos
             return  _context.Products.Include(p => p.ProductCategory).ToList();
    
         }
+
+
+        public Product GetById(int id)
+        {
+            var productById =  _context.Products.Find(id);
+            if (productById == null)
+            {
+                throw new ArgumentNullException(nameof(id));
+            }
+
+            return productById;
+        }
     }
 }

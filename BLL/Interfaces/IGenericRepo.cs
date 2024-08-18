@@ -1,5 +1,6 @@
 ﻿using DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BLL.Interfaces
 {
@@ -16,7 +17,6 @@ namespace BLL.Interfaces
         Task<T> GetByIdAsync(int id);
 
         Task<T> UpdateAsync(T entity);
-        
         void ToggleActiveAsync(int id);
 
         Task<bool> IsActive(int id);
@@ -24,5 +24,9 @@ namespace BLL.Interfaces
         Task<bool> IsDeActive(int id);
 
         Task<bool> IsDeleted(int id);
+
+
+
+ 
     }
 }

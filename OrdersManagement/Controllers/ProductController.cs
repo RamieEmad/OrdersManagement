@@ -14,6 +14,7 @@ namespace PL.Controllers
         private readonly ILogger<ProductController> _logger;
         private readonly IGenericRepo<ProductCategory> _generiCategory;
         private readonly IGenericRepo<Product> _genericProduct;
+    
 
         public ProductController
             (IUnitOfWork unitOfWork,
@@ -207,38 +208,32 @@ namespace PL.Controllers
         #endregion
 
         #region IS?
-        [HttpPost]
-        public IActionResult ToggleIsActive(int id)
+
+
+  
+        public IActionResult ToggleActive(int productId)
         {
-            _genericProduct.ToggleActiveAsync(id);
+            var product = _unitOfWork.ProductRepo.GetById(productId);
+
+            if (product != null)
+            {
+                product.IsActive = !product.IsActive;
+                _genericProduct.UpdateAsync(product);
+                
+                return Json
+                    (new { success = true,
+                    product = new { id = product.Id, isActive = product.IsActive }, 
+                    redirectUrl = Url.Action("List", "Product")
+                    });
+
+            }
+
             return RedirectToAction("List");
         }
+        
 
-
-        public async Task<bool> IsActive(int id)
-        {
-            bool isActiveProduct = await _genericProduct.IsActive(id);
-            return isActiveProduct;
-        }
-
-
-        public async Task<bool> IsDeActive(int id)
-        {
-            bool isDeActiveProduct = await _genericProduct.IsDeActive(id);
-            
-            return isDeActiveProduct;
-        }
-
-
-        public async Task<bool> IsDelete(int id)
-        {
-            var isDeletedProduct = await _genericProduct.IsDeleted(id);
-            return isDeletedProduct;
-            
-        }
 
         #endregion
-
 
         #endregion
     }
