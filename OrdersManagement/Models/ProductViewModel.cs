@@ -9,6 +9,7 @@ namespace PL.Models
         public string prodDesc { get; set; }
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
+        public bool IsSelected { get; set; }
 
         public int ProductCategoryId { get; set; }
         public ProductCategory ProductCategory { get; set; }

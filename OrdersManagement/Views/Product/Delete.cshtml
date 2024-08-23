@@ -75,9 +75,7 @@
     
 
         <form method="post" asp-action="Delete" asp-route-id="@Model.Id">
-
             <input type="hidden" asp-for="Id" />
-
             <a 
                asp-controller="Product" 
                asp-action="Update" 
@@ -85,13 +83,14 @@
                class="btn btn-primary">Edit
            </a>
 
-
-
             <span id="confirmDeleteSpan_@Model.Id" style="display:none">
                 <span>Are you sure you want to delete?</span>
                 <button type="submit" class="btn btn-danger">Yes</button>
-                <a href="#" class="btn btn-primary"
-                   onclick="confirmDelete('@Model.Id', false)">No</a>
+
+                <a 
+                   href="#" class="btn btn-primary"
+                   onclick="confirmDelete('@Model.Id', false)">No
+               </a>
             </span>
             
             <span id="deleteSpan_@Model.Id">
@@ -117,40 +116,12 @@
                     </div>
                 </div>
             </div>
+
         </div>
 
+        
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        </form>
+    </form>
     </div>
 
 

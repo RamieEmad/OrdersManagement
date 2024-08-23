@@ -2,6 +2,7 @@
 using BLL.Interfaces;
 using DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using PL.Models;
 
 namespace PL.Controllers
@@ -85,7 +86,7 @@ namespace PL.Controllers
         }
         #endregion
 
-        #region Delete
+        #region Delete & Confirmation & Delete int-Array
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
@@ -107,7 +108,21 @@ namespace PL.Controllers
                 await _genericProduct.DeleteAsync(viewModel.Id);
                 
             }
-            return RedirectToAction(nameof(List));
+            return RedirectToAction("List");
+        }
+
+        //Deleting Array
+        [HttpPost]
+        public async Task<IActionResult> DeleteProducts(int[] productIds)
+        {
+            foreach (var productId in productIds)
+            {
+                var product = await _genericProduct.GetByIdAsync(productId);
+                await _genericProduct.DeleteArray(product.Id);
+                
+            }
+
+            return Json(new { success = true });
         }
 
         #endregion
@@ -230,7 +245,14 @@ namespace PL.Controllers
 
             return RedirectToAction("List");
         }
-        
+
+
+        [HttpPost]
+        public ActionResult SelectAll(bool selectAll)
+        {
+            _genericProduct.SelectAllProducts(selectAll);
+            return PartialView("_ProductList", _genericProduct.GetAllAsync());
+        }
 
 
         #endregion

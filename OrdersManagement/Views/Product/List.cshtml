@@ -8,12 +8,13 @@
 
 <p>
     <a asp-controller="Product" asp-action="Add">Create New</a>
-</p>
 
-<table class="table">
+
+
+    <table class="table"  id="productTable">
     <thead>
         <tr>
-
+                <th><input type="checkbox" id="selectAll" /> Select All</th> 
             <th>
                 @Html.DisplayNameFor(model => model.prodName)
             </th>
@@ -29,6 +30,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.IsActive)
             </th>
+
             <th></th>
         </tr>
     </thead>
@@ -38,7 +40,7 @@
         @foreach (var item in Model)
         {
             <tr>
-         
+                    <td><input type="checkbox" class="productCheckbox" value="@item.Id" /></td> 
                 <td>
                     @Html.DisplayFor(modelItem => item.prodName)
                 </td>
@@ -71,14 +73,21 @@
                         class="btn @(item.IsActive ? "btn-success" : "btn-danger")">
                         @(item.IsActive ? "Active" : "Inactive")
                     </a>
+                       
 
                 </td> 
             </tr>
         }
-        @section Scripts {<script src="~/js/ToggleActive.js"></script>}
 
-
+        @section Scripts 
+        {
+            <script src="~/js/ToggleActive.js"></script>
+            <script src="~/js/SelectDeselect.js"></script>
+        }
+        
     </tbody>
 </table>
 
+    <button type="button" class="btn btn-success" 
 
+    id="deleteButton">Delete Selected Products</button>

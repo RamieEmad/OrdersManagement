@@ -11,5 +11,6 @@ namespace DAL.Entities
         public int Id {  get; set; }
         public bool IsDeleted { get; set; } = false;
         public bool IsActive { get; set; }
+        
     }
 }

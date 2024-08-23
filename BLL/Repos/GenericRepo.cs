@@ -39,6 +39,31 @@ namespace BLL.Repos
             }
         }
 
+
+        //Deleting Array
+        public async Task<T> DeleteArrayssss(int productIds)
+        {
+        //    var entityToDelete =  await _context.Set<T>().FindAsync(productIds);
+        //    if (entityToDelete != null)
+        //    {
+        //         _context.Set<T>().Remove(entityToDelete);
+        //         await _context.SaveChangesAsync();
+
+        //    }
+           return null;
+        }
+        
+        public async Task<bool> DeleteArray(int productIds)
+        {
+            var entityToDelete = await _context.Set<T>().FindAsync(productIds);
+            if (entityToDelete != null)
+            {
+                _context.Set<T>().Remove(entityToDelete);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
         //Updating
         public async Task<T> UpdateAsync(T entity)
         {
@@ -93,54 +118,24 @@ namespace BLL.Repos
             }
         }
 
-
-
-        public async Task<bool> IsActive(int id)
+ 
+        public void SelectAllProducts(bool selectAll)
         {
-            var findProductToActive = await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
-
-            if (findProductToActive == null)
-                throw new Exception(nameof(findProductToActive));
-
-
-            findProductToActive.IsActive = true;
-            await _context.SaveChangesAsync();
-
-            return true;
-
+            var products = _context.Products.ToList();
+            foreach (var product in products)
+            {
+                product.IsSelected = selectAll;
+            }
+            _context.SaveChanges();
         }
 
 
-        public async Task<bool> IsDeActive(int id)
-        {
-            var findProductToDeActive = await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
-
-            if (findProductToDeActive == null)
-                throw new Exception(nameof(findProductToDeActive));
 
 
-            findProductToDeActive.IsActive = true;
-            await _context.SaveChangesAsync();
 
-            return false;
-        }
-
-
-        public async Task<bool> IsDeleted(int id)
-        {
-            var findProductToTrueDelete = await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
-
-            if (findProductToTrueDelete == null)
-                throw new Exception(nameof(findProductToTrueDelete));
-
-            findProductToTrueDelete.IsDeleted = false;
-            await _context.SaveChangesAsync();
-
-            return false;
-        }
 
         #endregion
 
- 
+
     }
 }
