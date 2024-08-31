@@ -1,93 +1,139 @@
-﻿@model IEnumerable<PL.Models.ProductViewModel>
+﻿@using PL.Models;
+@model PaginatedList<PL.Models.ProductViewModel>
+
+
 
 @{
     ViewData["Title"] = "List";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<h1>List</h1>
+
+<h1>List Of Products</h1>
 
 <p>
     <a asp-controller="Product" asp-action="Add">Create New</a>
 
 
+    @using (Html.BeginForm("List", "Product", FormMethod.Get))
+    {
+    <p>
+        Find By Name:
+            @Html.TextBox("SearchString", ViewData["CurrentFilter"] as string)
+        <input type="submit" class="btn btn-primary" value="Search" />
+    </p>
+    }
 
-    <table class="table"  id="productTable">
+
+<table class="table" id="productTable">
     <thead>
+
         <tr>
-                <th><input type="checkbox" id="selectAll" /> Select All</th> 
+
             <th>
-                @Html.DisplayNameFor(model => model.prodName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.prodDesc)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductCategory.categoryDesc)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsDeleted)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsActive)
+                <input type="checkbox" id="selectAll" /> Select All
             </th>
 
-            <th></th>
+            <th>
+                    @Html.ActionLink("Product Name", "List", new { sortOrder = ViewData["NameSortParm"] })
+            </th>
+
+
+            <th>
+                    @(typeof(PL.Models.ProductViewModel).GetProperty("prodDesc").Name)
+                    @* @Html.DisplayNameFor(model => item.prodDesc) *@
+            </th>
+
+            <th>
+                    @(typeof(PL.Models.ProductViewModel).GetProperty("ProductCategory").PropertyType.GetProperty("categoryDesc").Name)
+                    @* @Html.DisplayNameFor(model => item.ProductCategory.categoryDesc) *@
+            </th>
+
+            <th>
+                    @* @Html.DisplayNameFor(model => model.IsDeleted) *@
+            </th>
+
+            <th>
+                    @Html.ActionLink("Active", "List", new { sortOrder = ViewData["IsActiveSortParm"] })
+            </th>
+
+            <th>
+            </th>
+
         </tr>
+
+
     </thead>
 
     <tbody>
 
-        @foreach (var item in Model)
-        {
+            @foreach (var item in Model)
+            {
             <tr>
-                    <td><input type="checkbox" class="productCheckbox" value="@item.Id" /></td> 
+
                 <td>
-                    @Html.DisplayFor(modelItem => item.prodName)
+                    <input type="checkbox" class="productCheckbox" value="@item.Id" />
                 </td>
 
                 <td>
-                    @Html.DisplayFor(modelItem => item.prodDesc)
+
+                        @Html.DisplayFor(modelItem => item.prodName)
                 </td>
 
                 <td>
-                    @Html.DisplayFor(modelItem => item.ProductCategory.categoryDesc)
+                        @Html.DisplayFor(modelItem => item.prodDesc)
                 </td>
 
                 <td>
-                    @Html.DisplayFor(modelItem => item.IsDeleted)
+                        @Html.DisplayFor(modelItem => item.ProductCategory.categoryDesc)
                 </td>
 
                 <td>
-                    @Html.DisplayFor(modelItem => item.IsActive)
+                        @* @Html.DisplayFor(modelItem => item.IsDeleted) *@
                 </td>
 
-              
+                <td>
+                        @Html.DisplayFor(modelItem => item.IsActive)
+                </td>
+
                 <td>
 
                     <a class="btn btn-primary" asp-action="Update" asp-route-id="@item.Id">Edit</a>
-                    <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.Id">Details</a> 
+                    <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.Id">Details</a>
                     <a class="btn btn-primary" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    <a 
-                        onclick="toggleActivation(this,'@Url.Action("ToggleActive", "Product")')"
-                        data-product-id="@item.Id"
-                        class="btn @(item.IsActive ? "btn-success" : "btn-danger")">
-                        @(item.IsActive ? "Active" : "Inactive")
+                    <a onclick="toggleActivation(this,'@Url.Action("ToggleActive", "Product")')"
+                       data-product-id="@item.Id"
+                       class="btn @(item.IsActive ? "btn-success" : "btn-danger")">
+                            @(item.IsActive ? "Active" : "Inactive")
                     </a>
-                       
 
-                </td> 
+
+                </td>
             </tr>
-        }
+            }
 
-        @section Scripts 
-        {
+
+            @section Scripts
+                {
             <script src="~/js/ToggleActive.js"></script>
             <script src="~/js/SelectDeselect.js"></script>
         }
-        
     </tbody>
 </table>
 
-    <button type="button" class="btn btn-success" 
+<button type="button" class="btn btn-success" id="deleteButton"> Delete Selected Products </button>
+<br />
 
-    id="deleteButton">Delete Selected Products</button>
+    @{
+        var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+        var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+    }
+
+<div style="text-align: center;">
+    <a asp-action="List" asp-route-pageNumber="@(Model.PageIndex - 1)" class="btn btn-primary @(prevDisabled)">Previous</a>
+    <a asp-action="List" asp-route-pageNumber="@(Model.PageIndex + 1)" class="btn btn-primary @(nextDisabled)">Next</a>
+</div>
+
+
+
+
+

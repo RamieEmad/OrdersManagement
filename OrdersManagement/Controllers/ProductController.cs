@@ -4,6 +4,8 @@ using DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using PL.Models;
+using System.Data;
+
 
 namespace PL.Controllers
 {
@@ -15,7 +17,7 @@ namespace PL.Controllers
         private readonly ILogger<ProductController> _logger;
         private readonly IGenericRepo<ProductCategory> _generiCategory;
         private readonly IGenericRepo<Product> _genericProduct;
-    
+
 
         public ProductController
             (IUnitOfWork unitOfWork,
@@ -28,7 +30,7 @@ namespace PL.Controllers
             _mapper = mapper;
             _generiCategory = genericRepo;
             _logger = logger;
-            _genericProduct = productRepo; 
+            _genericProduct = productRepo;
         }
 
         #endregion
@@ -40,13 +42,13 @@ namespace PL.Controllers
         public async Task<ActionResult> Add()
         {
             var categories = await _generiCategory.GetAllAsync();
-            
+
             if (categories == null)
             {
                 return NotFound();
             }
-            
-           // Get the Categories Seperated from => Product.Categories
+
+            // Get the Categories Seperated from => Product.Categories
             var productViewModel = new ProductViewModel
             {
                 ProductCategories = categories.Select(x => new ProductCategoryViewModel
@@ -79,10 +81,10 @@ namespace PL.Controllers
                 IsDeleted = productViewModel.IsDeleted
             };
 
-                var productToAdd = _mapper.Map<Product>(product);
-                await _genericProduct.AddAsync(productToAdd);
+            var productToAdd = _mapper.Map<Product>(product);
+            await _genericProduct.AddAsync(productToAdd);
 
-                return RedirectToAction(nameof(List));
+            return RedirectToAction(nameof(List));
         }
         #endregion
 
@@ -106,7 +108,7 @@ namespace PL.Controllers
 
                 // Already checked " if not null "
                 await _genericProduct.DeleteAsync(viewModel.Id);
-                
+
             }
             return RedirectToAction("List");
         }
@@ -119,7 +121,7 @@ namespace PL.Controllers
             {
                 var product = await _genericProduct.GetByIdAsync(productId);
                 await _genericProduct.DeleteArray(product.Id);
-                
+
             }
 
             return Json(new { success = true });
@@ -168,30 +170,68 @@ namespace PL.Controllers
 
         #endregion
 
-        #region Details
-
-        public async Task<IActionResult> Details(int id)
-        {
-            var getByIdProduct = await _genericProduct.GetByIdAsync(id);
-            var productViewModel = _mapper.Map<ProductViewModel>(getByIdProduct);
-            return View(productViewModel);
-        }
-        #endregion
-
-        #region Read-GET
+        #region LIST & GET
         [HttpGet]
-        public ActionResult List()
+        public ActionResult List(string sortOrder, string searchString, int? pageNumber= 1)
         {
+            #region ViewData & ProductListWithCategory
+
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "prodName_desc" : "";
+            ViewData["IsActiveSortParm"] = sortOrder == "IsActive" ? "IsActive_desc" : "IsActive";
+            ViewData["CurrentFilter"] = searchString;
+
             var getAllProduct = _unitOfWork.ProductRepo.GetAllProductWithCategory();
-            var productViewModels = _mapper.Map<IEnumerable<ProductViewModel>>(getAllProduct);
 
-            if (productViewModels == null)
+            #endregion
+
+            #region Sorting
+            switch (sortOrder)
             {
-                return NotFound();
-            }
+                case "prodName_desc":
+                    getAllProduct = getAllProduct.OrderByDescending(p => p.prodName);
+                    break;
 
-            return View(productViewModels);
+                case "prodName":
+                    getAllProduct = getAllProduct.OrderBy(p => p.prodName);
+                    break;
+
+                case "IsActive_desc":
+                    getAllProduct = getAllProduct.OrderByDescending(p => p.IsActive);
+                    break;
+
+                case "IsActive":
+                    getAllProduct = getAllProduct.OrderBy(p => p.IsActive);
+                    break;
+
+                default:
+                    getAllProduct = getAllProduct.OrderBy(p => p.prodName);
+                    break;
+            }
+            #endregion
+
+            #region Search
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                getAllProduct = getAllProduct.Where(p => p.prodName.Contains(searchString));
+
+            }
+            #endregion
+
+            #region Pagination
+            int pageSize = 5;
+            //var productList = _genericProduct.GetAllProductToList();
+            var productViewModels = _mapper.Map<List<ProductViewModel>>(getAllProduct);
+
+
+            return View(PaginatedList<ProductViewModel>.Create(productViewModels,
+                   pageNumber ?? 1, pageSize));
+
+        
+
+
+            #endregion
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetByIdAsync(int id)
@@ -220,12 +260,22 @@ namespace PL.Controllers
             return View();
 
         }
+
+        #endregion
+
+        #endregion
+
+        #region Details
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var getByIdProduct = await _genericProduct.GetByIdAsync(id);
+            var productViewModel = _mapper.Map<ProductViewModel>(getByIdProduct);
+            return View(productViewModel);
+        }
         #endregion
 
         #region IS?
-
-
-  
         public IActionResult ToggleActive(int productId)
         {
             var product = _unitOfWork.ProductRepo.GetById(productId);
@@ -234,11 +284,13 @@ namespace PL.Controllers
             {
                 product.IsActive = !product.IsActive;
                 _genericProduct.UpdateAsync(product);
-                
+
                 return Json
-                    (new { success = true,
-                    product = new { id = product.Id, isActive = product.IsActive }, 
-                    redirectUrl = Url.Action("List", "Product")
+                    (new
+                    {
+                        success = true,
+                        product = new { id = product.Id, isActive = product.IsActive },
+                        redirectUrl = Url.Action("List", "Product")
                     });
 
             }
@@ -246,17 +298,9 @@ namespace PL.Controllers
             return RedirectToAction("List");
         }
 
-
-        [HttpPost]
-        public ActionResult SelectAll(bool selectAll)
-        {
-            _genericProduct.SelectAllProducts(selectAll);
-            return PartialView("_ProductList", _genericProduct.GetAllAsync());
-        }
-
-
         #endregion
 
-        #endregion
+
     }
 }
+

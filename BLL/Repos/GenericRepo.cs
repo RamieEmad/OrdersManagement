@@ -3,14 +3,14 @@ using DAL.Entities;
 using DAL.OrderManagementDBContext;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using System.Linq.Expressions;
 
 namespace BLL.Repos
 {
-       
+
     public class GenericRepo<T> : IGenericRepo<T> where T : BaseClass
     {
-       #region GenericRepo
+        #region CTOR
         private readonly OrderManagementDBContext _context;
         public GenericRepo(OrderManagementDBContext context)
         {
@@ -19,9 +19,9 @@ namespace BLL.Repos
         }
         #endregion
 
-       #region CRUD
+        #region CRUD
         //Adding
-        public async Task AddAsync([FromForm]T entity)
+        public async Task AddAsync([FromForm] T entity)
         {
             _context.Set<T>().Add(entity);
             await _context.SaveChangesAsync();
@@ -29,7 +29,7 @@ namespace BLL.Repos
 
 
         //Deleting
-        public async Task DeleteAsync (int id)
+        public async Task DeleteAsync(int id)
         {
             var entityToDelete = await _context.Set<T>().FindAsync(id);
             if (entityToDelete != null)
@@ -40,19 +40,6 @@ namespace BLL.Repos
         }
 
 
-        //Deleting Array
-        public async Task<T> DeleteArrayssss(int productIds)
-        {
-        //    var entityToDelete =  await _context.Set<T>().FindAsync(productIds);
-        //    if (entityToDelete != null)
-        //    {
-        //         _context.Set<T>().Remove(entityToDelete);
-        //         await _context.SaveChangesAsync();
-
-        //    }
-           return null;
-        }
-        
         public async Task<bool> DeleteArray(int productIds)
         {
             var entityToDelete = await _context.Set<T>().FindAsync(productIds);
@@ -74,13 +61,13 @@ namespace BLL.Repos
 
         #endregion
 
-       #region Get-Funs
+        #region Get-Funs
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _context.Set<T>().ToListAsync();
         }
-  
+
 
         public async Task<T> GetByIdAsync(int id)
         {
@@ -104,10 +91,13 @@ namespace BLL.Repos
                 return isActiveProducts;
         }
 
-
+        public List<T> GetAllProductToList()
+        {
+            return _context.Set<T>().ToList();
+        }
         #endregion
 
-       #region IS?
+        #region IS?
         public void ToggleActiveAsync(int id)
         {
             var product = _context.Products.Find(id);
@@ -118,21 +108,19 @@ namespace BLL.Repos
             }
         }
 
- 
-        public void SelectAllProducts(bool selectAll)
-        {
-            var products = _context.Products.ToList();
-            foreach (var product in products)
-            {
-                product.IsSelected = selectAll;
-            }
-            _context.SaveChanges();
-        }
 
+        //public void SelectAllProducts(bool selectAll)
+        //{
+        //    var products = _context.Products.ToList();
+        //    foreach (var product in products)
+        //    {
+        //        product.IsSelected = selectAll;
+        //    }
+        //    _context.SaveChanges();
+        //}
+        #endregion
 
-
-
-
+        #region 
 
         #endregion
 

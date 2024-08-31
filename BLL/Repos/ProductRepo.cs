@@ -13,9 +13,9 @@ namespace BLL.Repos
             _context = context;
         }
 
-        public  IEnumerable<Product> GetAllProductWithCategory()
+        public IEnumerable<Product> GetAllProductWithCategory()
         {
-            return  _context.Products.Include(p => p.ProductCategory).ToList();
+            return _context.Products.Include(p => p.ProductCategory).ToList();
    
         }
 
@@ -27,8 +27,10 @@ namespace BLL.Repos
             {
                 throw new ArgumentNullException(nameof(id));
             }
-
             return productById;
         }
+
+
     }
 }
+

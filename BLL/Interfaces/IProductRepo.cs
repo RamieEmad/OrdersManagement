@@ -6,5 +6,7 @@ namespace BLL.Interfaces
     {
         IEnumerable<Product> GetAllProductWithCategory();
         public Product GetById(int id);
+        
+     
     }
 }
