@@ -91,10 +91,7 @@ namespace BLL.Repos
                 return isActiveProducts;
         }
 
-        public List<T> GetAllProductToList()
-        {
-            return _context.Set<T>().ToList();
-        }
+
         #endregion
 
         #region IS?
@@ -123,6 +120,9 @@ namespace BLL.Repos
         #region 
 
         #endregion
+
+
+
 
 
     }

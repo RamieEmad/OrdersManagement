@@ -6,10 +6,11 @@ namespace PL.Mapping
 {
     public class MappingProfile : Profile
     {
-        public MappingProfile() 
+        public MappingProfile()
         {
             CreateMap<ProductViewModel, Product>().ReverseMap();
             CreateMap<ProductCategoryViewModel, ProductCategory>().ReverseMap();
+            CreateMap<ProductPriceHistoryViewModel, ProductPriceHistory>().ReverseMap();
         }
     }
 }

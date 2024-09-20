@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(OrderManagementDBContext.OrderManagementDBContext))]
-    [Migration("20240820142447_AddNewColumnToProducts")]
-    partial class AddNewColumnToProducts
+    [Migration("20240907162942_FirstAndAll")]
+    partial class FirstAndAll
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

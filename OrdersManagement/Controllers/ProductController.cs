@@ -84,7 +84,7 @@ namespace PL.Controllers
             var productToAdd = _mapper.Map<Product>(product);
             await _genericProduct.AddAsync(productToAdd);
 
-            return RedirectToAction(nameof(List));
+            return Redirect("~/Product/List");
         }
         #endregion
 
@@ -219,7 +219,7 @@ namespace PL.Controllers
 
             #region Pagination
             int pageSize = 5;
-            //var productList = _genericProduct.GetAllProductToList();
+            
             var productViewModels = _mapper.Map<List<ProductViewModel>>(getAllProduct);
 
 

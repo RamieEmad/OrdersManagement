@@ -11,6 +11,6 @@ namespace PL.Models
 
         [Display(Name = "Product Category")]
         public string categoryDesc { get; set; }
-        public IEnumerable<Product> Products { get; set; }
+        public Product Products { get; set; }
     }
 }

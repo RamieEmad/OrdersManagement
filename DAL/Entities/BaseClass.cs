@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DAL.Entities
 {
-    public class BaseClass
+    public abstract class BaseClass
     {
         public int Id {  get; set; }
         public bool IsDeleted { get; set; } = false;

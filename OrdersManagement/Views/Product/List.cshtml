@@ -49,16 +49,14 @@
             </th>
 
             <th>
-                    @* @Html.DisplayNameFor(model => model.IsDeleted) *@
-            </th>
-
-            <th>
                     @Html.ActionLink("Active", "List", new { sortOrder = ViewData["IsActiveSortParm"] })
             </th>
-
             <th>
+                    @* @(typeof(PL.Models.ProductViewModel).GetProperty("ProductPriceHistory").PropertyType.GetProperty("Price").Name)*@
+
             </th>
 
+            <th></th>
         </tr>
 
 
@@ -69,13 +67,11 @@
             @foreach (var item in Model)
             {
             <tr>
-
                 <td>
-                    <input type="checkbox" class="productCheckbox" value="@item.Id" />
+                        <input type="checkbox" class="productCheckbox" value="@item.Id" />
                 </td>
 
                 <td>
-
                         @Html.DisplayFor(modelItem => item.prodName)
                 </td>
 
@@ -88,23 +84,41 @@
                 </td>
 
                 <td>
-                        @* @Html.DisplayFor(modelItem => item.IsDeleted) *@
+                        @Html.DisplayFor(modelItem => item.IsActive)
+                </td>
+
+                
+
+@*                 <td>
+                    @Html.DisplayFor(modelItem => item.ProductPriceHistory.EffectiveDate)    
                 </td>
 
                 <td>
-                        @Html.DisplayFor(modelItem => item.IsActive)
+
+                <td>
+                        @Html.DisplayFor(modelItem => item.ProductPriceHistory.Discount)
+                </td> *@
+
+                <td>
+                        
+                          @Html.DisplayFor(modelItem => item.ProductPriceHistory.Price)
                 </td>
+
+
 
                 <td>
 
                     <a class="btn btn-primary" asp-action="Update" asp-route-id="@item.Id">Edit</a>
                     <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.Id">Details</a>
                     <a class="btn btn-primary" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+
                     <a onclick="toggleActivation(this,'@Url.Action("ToggleActive", "Product")')"
-                       data-product-id="@item.Id"
-                       class="btn @(item.IsActive ? "btn-success" : "btn-danger")">
-                            @(item.IsActive ? "Active" : "Inactive")
-                    </a>
+                               data-product-id="@item.Id"
+                               class="btn @(item.IsActive ? "btn-success" : "btn-danger")">
+                               @(item.IsActive ? "Active" : "Inactive")<a>
+
+                    
+                    
 
 
                 </td>

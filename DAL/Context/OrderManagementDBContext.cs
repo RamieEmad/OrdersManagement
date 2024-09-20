@@ -4,13 +4,17 @@ using Microsoft.EntityFrameworkCore.Design;
 
 
 
-namespace DAL.OrderManagementDBContext 
+namespace DAL.OrderManagementDBContext
 {
     public class OrderManagementDBContext : DbContext
     {
-        public OrderManagementDBContext(DbContextOptions<OrderManagementDBContext> options) : base(options){ }
+        public OrderManagementDBContext(DbContextOptions<OrderManagementDBContext> options) : base(options) 
+        { 
+
+        }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
+        public DbSet<ProductPriceHistory> ProductPriceHistories { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -22,12 +26,22 @@ namespace DAL.OrderManagementDBContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            if (modelBuilder == null)
+            {
+                throw new ArgumentNullException(nameof(modelBuilder));
+            }
+
+            //one-to-many { Product => ProductCategory }
             modelBuilder.Entity<Product>()
                 .HasOne(p => p.ProductCategory)
-
-                .WithMany(pc => pc.Products)   
-
+                .WithMany(pc => pc.Products)
                 .HasForeignKey(p => p.ProductCategoryId);
+
+            ////one-to-many { Product => ProductPriceHistories }
+            //modelBuilder.Entity<Product>()
+            //    .HasMany(p => p.ProductPriceHistories)
+            //    .WithOne(pph => pph.Product)
+            //    .HasForeignKey(pph => pph.ProductId);
         }
     }
 
@@ -41,4 +55,6 @@ namespace DAL.OrderManagementDBContext
             return new OrderManagementDBContext(optionsBuilder.Options);
         }
     }
+
+
 }

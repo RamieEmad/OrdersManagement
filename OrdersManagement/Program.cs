@@ -21,12 +21,14 @@ namespace DAL.OrderManagementDBContext
                 options.UseSqlServer(builder.Configuration.GetConnectionString
                 ("Server=.\\SQLEXPRESS;Database=OrderManagementDBContext;Trusted_Connection=True; Encrypt=false;")));
 
-            
+
+            builder.Services.AddAutoMapper(map => map.AddProfile(new MappingProfile()));
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IProductRepo, ProductRepo>();
             builder.Services.AddScoped<IProductCategoryRepo, ProductCategoryRepo>();
+            //builder.Services.AddScoped<IProductPriceHistoryRepo, ProductPriceHistoryRepo>();
             builder.Services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
-            builder.Services.AddAutoMapper(map => map.AddProfile(new MappingProfile()));
+           
 
             var app = builder.Build();
 

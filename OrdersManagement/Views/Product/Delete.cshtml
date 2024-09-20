@@ -74,7 +74,7 @@
     </dl>
     
 
-        <form method="post" asp-action="Delete" asp-route-id="@Model.Id">
+    <form method="post" asp-action="Delete" asp-route-id="@Model.Id">
             <input type="hidden" asp-for="Id" />
             <a 
                asp-controller="Product" 
@@ -97,7 +97,7 @@
                 <a href="#" class="btn btn-danger"
                    onclick="confirmDelete('@Model.Id', true)">Delete</a>
             </span>
-
+@* 
         <div class="modal fade" id="deleteProductModal" tabindex="-1" role="dialog" aria-labelledby="deleteProductModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -117,7 +117,7 @@
                 </div>
             </div>
 
-        </div>
+        </div> *@
 
         
 

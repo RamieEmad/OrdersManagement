@@ -15,10 +15,10 @@ namespace BLL.Repos
 
         public IEnumerable<Product> GetAllProductWithCategory()
         {
-            return _context.Products.Include(p => p.ProductCategory).ToList();
-   
-        }
 
+            var products = _context.Products.Include(p => p.ProductCategory).Include(p => p.ProductPriceHistories).ToList();
+            return (products);
+        }
 
         public Product GetById(int id)
         {
@@ -29,6 +29,24 @@ namespace BLL.Repos
             }
             return productById;
         }
+
+        IQueryable<Product> IProductRepo.GetAllProductAndPricingHistory()
+        {
+            var products = _context.Products.Include(p => p.ProductCategory)
+            .Include(p => p.ProductPriceHistories);
+
+            return  (products);
+        }
+
+
+
+        public ProductPriceHistory GetActivePriceByProductId(int productId)
+        {
+
+            return _context.ProductPriceHistories.FirstOrDefault(pph => pph.ProductId == productId && pph.IsActive);
+
+        }
+
 
 
     }

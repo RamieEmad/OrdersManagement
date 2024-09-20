@@ -17,13 +17,7 @@ namespace BLL.Interfaces
         Task<T> GetByIdAsync(int id);
         Task<T> UpdateAsync(T entity);
         void ToggleActiveAsync(int id);
-        //public void SelectAllProducts(bool selectAll);
-     
         
-
-
-
-
 
 
     }
