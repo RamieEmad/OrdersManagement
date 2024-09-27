@@ -11,6 +11,16 @@ namespace PL.Mapping
             CreateMap<ProductViewModel, Product>().ReverseMap();
             CreateMap<ProductCategoryViewModel, ProductCategory>().ReverseMap();
             CreateMap<ProductPriceHistoryViewModel, ProductPriceHistory>().ReverseMap();
+            CreateMap<UploadFile, UploadFileViewModel>().ReverseMap();
+
+
+
+
+            //CreateMap<ProductUploadFileViewModel, ProductUploadFile>()
+            //        .ForMember(dest => dest.ImgFile, opt => opt.MapFrom(src => src.ImgFile.OpenReadStream()))
+            //        .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ProductId))
+            //        .ForMember(dest => dest.Product, opt => opt.Ignore());
         }
     }
+    
 }

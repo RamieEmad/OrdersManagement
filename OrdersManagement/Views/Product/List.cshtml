@@ -1,6 +1,7 @@
-﻿@using PL.Models;
+﻿@using DAL.Entities
+@using PL.Models;
+@using System.Text.RegularExpressions
 @model PaginatedList<PL.Models.ProductViewModel>
-
 
 
 @{
@@ -9,8 +10,6 @@
 }
 
 <h1>List Of Products</h1>
-
-<p>
     <a asp-controller="Product" asp-action="Add">Create New</a>
 
 
@@ -40,6 +39,7 @@
 
             <th>
                     @(typeof(PL.Models.ProductViewModel).GetProperty("prodDesc").Name)
+             
                     @* @Html.DisplayNameFor(model => item.prodDesc) *@
             </th>
 
@@ -51,11 +51,14 @@
             <th>
                     @Html.ActionLink("Active", "List", new { sortOrder = ViewData["IsActiveSortParm"] })
             </th>
+
             <th>
                     @* @(typeof(PL.Models.ProductViewModel).GetProperty("ProductPriceHistory").PropertyType.GetProperty("Price").Name)*@
 
             </th>
 
+            <th>Product Images</th>
+            <th></th>
             <th></th>
         </tr>
 
@@ -64,47 +67,73 @@
 
     <tbody>
 
-            @foreach (var item in Model)
-            {
+        @foreach (var item in Model)
+        {
             <tr>
-                <td>
+                <td width="110">
                         <input type="checkbox" class="productCheckbox" value="@item.Id" />
                 </td>
 
-                <td>
+                <td width="130">
                         @Html.DisplayFor(modelItem => item.prodName)
                 </td>
 
-                <td>
+                <td width="100">
                         @Html.DisplayFor(modelItem => item.prodDesc)
                 </td>
 
-                <td>
+                <td width="100">
                         @Html.DisplayFor(modelItem => item.ProductCategory.categoryDesc)
                 </td>
 
-                <td>
+                <td width="80">
                         @Html.DisplayFor(modelItem => item.IsActive)
                 </td>
 
-                
-
-@*                 <td>
-                    @Html.DisplayFor(modelItem => item.ProductPriceHistory.EffectiveDate)    
+                <td> 
+                          @Html.DisplayFor(modelItem => item.ProductPriceHistory.Price) 
                 </td>
 
+                @* 
                 <td>
-
-                <td>
-                        @Html.DisplayFor(modelItem => item.ProductPriceHistory.Discount)
-                </td> *@
-
-                <td>
-                        
-                          @Html.DisplayFor(modelItem => item.ProductPriceHistory.Price)
+                    @if (item.UploadFilesViewModel != null && item.UploadFilesViewModel.Any())
+                    {
+                        @foreach (var uploadFile in item.UploadFilesViewModel)
+                        {
+                            @if (!string.IsNullOrEmpty(uploadFile.ImageUrl) && uploadFile.ContentType.StartsWith(".jpg") || uploadFile.ContentType.StartsWith(".jpeg") || uploadFile.ContentType.StartsWith(".png") || uploadFile.ContentType.StartsWith(".gif") || uploadFile.ContentType.StartsWith(".bmp") || uploadFile.ContentType.StartsWith(".webp"))
+                            {
+                                <a href="@Url.Content(uploadFile.ImageUrl)" target="_blank">
+                                    <img src="@Url.Content(uploadFile.ImageUrl)" alt="@uploadFile.FileName" class="product-image" width="40" height="40" />
+                                </a>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <p>No uploaded files for this product.</p>
+                    }
                 </td>
+                *@
 
 
+               <td width="190">
+
+                    @if (item.UploadFilesViewModel != null && item.UploadFilesViewModel.Any())
+                    {
+                        @foreach (var uploadFile in item.UploadFilesViewModel)
+                        {
+                            <a href="@uploadFile.ImageUrl" target="_blank">
+                                <img src="@uploadFile.ImageUrl" alt="@uploadFile.FileName" class="product-image" width="50" height="50" />
+                            </a>
+                        }
+                    }
+                    else
+                    {
+                         <p style="color: lightcoral;">No Image</p>
+                    }
+                </td> 
+
+                <td width="200"></td>
 
                 <td>
 
@@ -117,13 +146,10 @@
                                class="btn @(item.IsActive ? "btn-success" : "btn-danger")">
                                @(item.IsActive ? "Active" : "Inactive")<a>
 
-                    
-                    
-
-
                 </td>
             </tr>
-            }
+        }   
+
 
 
             @section Scripts

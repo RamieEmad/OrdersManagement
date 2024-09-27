@@ -3,9 +3,9 @@ using BLL.Interfaces;
 using DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using PL.Models;
 using System.Data;
-
 
 namespace PL.Controllers
 {
@@ -17,6 +17,8 @@ namespace PL.Controllers
         private readonly ILogger<ProductController> _logger;
         private readonly IGenericRepo<ProductCategory> _generiCategory;
         private readonly IGenericRepo<Product> _genericProduct;
+        private readonly IWebHostEnvironment _webHost;
+        private readonly IUploadFileRepo _uploadFileRepo;
 
 
         public ProductController
@@ -24,13 +26,17 @@ namespace PL.Controllers
             IMapper mapper,
             IGenericRepo<ProductCategory> genericRepo,
             ILogger<ProductController> logger,
-            IGenericRepo<Product> productRepo)
+            IGenericRepo<Product> productRepo,
+            IWebHostEnvironment webHost,
+            IUploadFileRepo uploadFileRepo)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _generiCategory = genericRepo;
             _logger = logger;
             _genericProduct = productRepo;
+            _webHost = webHost;
+            _uploadFileRepo = uploadFileRepo;   
         }
 
         #endregion
@@ -65,31 +71,74 @@ namespace PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Add(ProductViewModel productViewModel)
+        public async Task<ActionResult> Add(ProductViewModel productViewModel, UploadFileViewModel uploadFileViewModel)
         {
             if (productViewModel == null)
             {
                 return NotFound();
             }
 
-            var product = new Product
+            Product product = new Product
             {
                 prodName = productViewModel.prodName,
                 prodDesc = productViewModel.prodDesc,
                 ProductCategoryId = productViewModel.ProductCategoryId,
                 IsActive = productViewModel.IsActive,
-                IsDeleted = productViewModel.IsDeleted
+                IsDeleted = productViewModel.IsDeleted,
+                
             };
 
             var productToAdd = _mapper.Map<Product>(product);
             await _genericProduct.AddAsync(productToAdd);
 
-            return Redirect("~/Product/List");
-        }
-        #endregion
+            #region Upload-File
+            if (uploadFileViewModel != null && uploadFileViewModel.File.Length > 0)
+            {
 
+                // If a file is uploaded, save it to the images directory
+                if (uploadFileViewModel.File != null)
+                {
+                    // Create a directory for product images if it doesn't exist
+                    string imagesDir = Path.Combine(_webHost.WebRootPath, "Product", "Images");
+                    if (!Directory.Exists(imagesDir))
+                    {
+                        Directory.CreateDirectory(imagesDir);
+                    }
+
+                    // Save the file to the images directory
+                        
+                    string filePath = Path.Combine(imagesDir, uploadFileViewModel.File.FileName);
+
+                    // Get the relative path from the web root path to the file path
+                    string relativePath = Path.GetRelativePath(_webHost.WebRootPath, filePath);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        uploadFileViewModel.File.CopyTo(stream);
+                    }
+
+                    // Create a new UploadFile entity
+                    UploadFile uploadFile = new UploadFile
+                    {
+                        ProductId = productToAdd.Id, 
+                        ImageUrl = $"/{relativePath}",/*$"/Product/Images/{Guid.NewGuid()}{uploadFileViewModel.File.FileName}",*/
+                        FileName = uploadFileViewModel.File.FileName,
+                        ContentType =  Path.GetExtension(uploadFileViewModel.File.FileName).ToLower()
+                    };
+
+                    //saving
+                    await _unitOfWork.UploadFileRepo.AddAsync(uploadFile);
+
+                }
+            }
+            #endregion
+
+            return Redirect("~/Product/List");
+
+        } 
+            #endregion
+        
         #region Delete & Confirmation & Delete int-Array
-        [HttpGet]
+            [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
             var getByIdProduct = await _genericProduct.GetByIdAsync(id);
@@ -130,8 +179,6 @@ namespace PL.Controllers
         #endregion
 
         #region Update
-        //Get/ProductById/ToUpdate
-
         [HttpGet]
         public async Task<IActionResult> Update(int id)
         {
@@ -148,7 +195,7 @@ namespace PL.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(int id, [FromForm] ProductViewModel viewModel)
+        public async Task<IActionResult> Update(int id, [FromForm] ProductViewModel viewModel, [FromForm]UploadFileViewModel uploadFileViewModel)
         {
             if (id != viewModel.Id)
             {
@@ -156,17 +203,82 @@ namespace PL.Controllers
             }
 
             var product = await _genericProduct.GetByIdAsync(id);
-
             if (product == null)
             {
                 return NotFound("Product not found");
             }
 
-            var updatedProduct = _mapper.Map(viewModel, product);
-            await _genericProduct.UpdateAsync(updatedProduct);
+                var updatedProduct = _mapper.Map(viewModel, product);
+                await _genericProduct.UpdateAsync(updatedProduct);
+
+            #region Upload-File
+            if (uploadFileViewModel != null && uploadFileViewModel.File.Length > 0)
+            {
+                try
+                {
+                    // Create a directory for product images if it doesn't exist
+                    string imagesDir = Path.Combine(_webHost.WebRootPath, "Product", "Images");
+                    if (!Directory.Exists(imagesDir))
+                    {
+                        Directory.CreateDirectory(imagesDir);
+                    }
+
+                    // Get the relative path from the web root path to the file path
+                    string filePath = Path.Combine(imagesDir, uploadFileViewModel.File.FileName);
+
+                    // Save the file to the specified path
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        uploadFileViewModel.File.CopyTo(stream);
+                    }
+
+                    // Get the relative path from the web root path to the file path
+                    string relativePath = Path.GetRelativePath(_webHost.WebRootPath, filePath);
+
+                    // Retrieve all existing images for the product from the database
+                    var existingImages = await _uploadFileRepo.GetUploadFilesByProductId(product.Id);
+
+                    // Clear existing images
+                    if (existingImages.Any())
+                    {
+                        foreach (var existingImage in existingImages)
+                        {
+                            // Delete the existing image file
+                            string existingImagePath = Path.Combine(_webHost.WebRootPath, existingImage.ImageUrl.TrimStart('/'));
+                            if (System.IO.File.Exists(existingImagePath))
+                            {
+                                System.IO.File.Delete(existingImagePath);
+                            }
+
+                            // Remove the existing image from the database
+                            await _unitOfWork.UploadFileRepo.DeleteAsync(existingImage.Id);
+                        }
+                    }
+
+                    // Create a new UploadFile entity
+                    UploadFile uploadFile = new UploadFile
+                    {
+                        ProductId = product.Id,
+                        ImageUrl = $"/{relativePath}",
+                        FileName = uploadFileViewModel.File.FileName,
+                        ContentType = Path.GetExtension(uploadFileViewModel.File.FileName).ToLower()
+                    };
+
+                    // Save the new UploadFile entity to the database
+                    await _unitOfWork.UploadFileRepo.AddAsync(uploadFile);
+                }
+                catch (Exception ex)
+                {
+                    // Handle the exception
+                    _logger.LogError(ex, "Error uploading file");
+                }
+            }
+            #endregion
 
             return RedirectToAction("List");
         }
+
+        #endregion
 
         #endregion
 
@@ -209,7 +321,7 @@ namespace PL.Controllers
             }
             #endregion
 
-            #region Search
+            #region Searching
             if (!String.IsNullOrEmpty(searchString))
             {
                 getAllProduct = getAllProduct.Where(p => p.prodName.Contains(searchString));
@@ -217,16 +329,21 @@ namespace PL.Controllers
             }
             #endregion
 
-            #region Pagination
+            #region Pagination & Foreach-ToShowImage
             int pageSize = 5;
             
             var productViewModels = _mapper.Map<List<ProductViewModel>>(getAllProduct);
 
+            // Retrieve the uploaded files for each product
+            foreach (var productViewModel in productViewModels)
+            {
+                var uploadFiles = _unitOfWork.UploadFileRepo.GetUploadFilesByProductId(productViewModel.Id).Result;
+                var uploadFileViewModels = _mapper.Map<List<UploadFileViewModel>>(uploadFiles);
+                productViewModel.UploadFilesViewModel = uploadFileViewModels;
+            }
 
             return View(PaginatedList<ProductViewModel>.Create(productViewModels,
                    pageNumber ?? 1, pageSize));
-
-        
 
 
             #endregion
@@ -260,8 +377,6 @@ namespace PL.Controllers
             return View();
 
         }
-
-        #endregion
 
         #endregion
 
@@ -299,8 +414,7 @@ namespace PL.Controllers
         }
 
         #endregion
-
-
     }
 }
+
 

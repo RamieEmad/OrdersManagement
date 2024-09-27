@@ -16,17 +16,22 @@ namespace DAL.OrderManagementDBContext
             // Add services to the container.
             builder.Services.AddControllersWithViews();
            
-
+            //Connection-String
             builder.Services.AddDbContext<OrderManagementDBContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString
                 ("Server=.\\SQLEXPRESS;Database=OrderManagementDBContext;Trusted_Connection=True; Encrypt=false;")));
 
-
+            //CONFIG
             builder.Services.AddAutoMapper(map => map.AddProfile(new MappingProfile()));
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+       
             builder.Services.AddScoped<IProductRepo, ProductRepo>();
             builder.Services.AddScoped<IProductCategoryRepo, ProductCategoryRepo>();
-            //builder.Services.AddScoped<IProductPriceHistoryRepo, ProductPriceHistoryRepo>();
+            builder.Services.AddScoped<UploadFileRepo>();
+            builder.Services.AddScoped<IUploadFileRepo, UploadFileRepo>();
+            builder.Services.AddScoped<IProductPriceHistoryRepo, ProductPriceHistoryRepo>();
+
+
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
            
 

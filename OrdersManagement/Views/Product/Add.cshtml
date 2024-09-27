@@ -1,4 +1,5 @@
 ﻿@model PL.Models.ProductViewModel
+@using PL.Models;
 
 @{
     ViewData["Title"] = "Add";
@@ -12,11 +13,10 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Add" asp-controller="Product">
+        <form asp-action="Add" asp-controller="Product" enctype="multipart/form-data">
 
             @Html.HiddenFor(m => m.Id)
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
             <div><input type="hidden" asp-for="Id" /></div>
 
 
@@ -36,7 +36,6 @@
 
             <div class="form-group">
                 <label asp-for="ProductCategoryId" class="control-label">Pick a Category</label>
-
                 <select class="form-control" asp-for="ProductCategoryId"
                         asp-items="@(new SelectList(Model.ProductCategories,"Id" , "categoryName"))">
                     <option></option>
@@ -44,27 +43,29 @@
 
             </div>
 
+            
+            @Html.Partial("~/Views/Shared/_UploadFile.cshtml", new UploadFileViewModel())
+            <br />
+
             <div class="form-group form-check">
                 <label class="form-check-label">
-
                     <input class="form-check-input" asp-for="IsDeleted" />
-
                     @Html.DisplayNameFor(model => model.IsDeleted)
                 </label>
 
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
-
                     <input class="form-check-input" asp-for="IsActive" />
-
                     @Html.DisplayNameFor(model => model.IsActive)
                 </label>
             </div>
 
             <div class="form-group">
 
+
                 <input type="submit" value="Create" class="btn btn-primary" />
+
             </div>
         </form>
     </div>
@@ -76,6 +77,7 @@
 
 @section Scripts {
     @{
+       
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }

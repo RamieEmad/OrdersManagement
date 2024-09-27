@@ -15,6 +15,7 @@ namespace DAL.OrderManagementDBContext
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<ProductPriceHistory> ProductPriceHistories { get; set; }
+        public DbSet <UploadFile> UploadFiles { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

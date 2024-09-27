@@ -1,15 +1,9 @@
-﻿using DAL.Entities;
-using Microsoft.AspNetCore.Mvc;
-using PagedList;
-using System.Linq.Expressions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace BLL.Interfaces
+﻿namespace BLL.Interfaces
 {
 
     public interface IGenericRepo<T> where T : class
     {
-        Task AddAsync([FromForm] T entity);
+        Task AddAsync(T entity);
         Task DeleteAsync(int id);
         Task<bool> DeleteArray(int productIds);
         Task<IEnumerable<T>> GetAllAsync();
@@ -18,6 +12,7 @@ namespace BLL.Interfaces
         Task<T> UpdateAsync(T entity);
         void ToggleActiveAsync(int id);
         
+
 
 
     }

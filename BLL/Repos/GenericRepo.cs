@@ -1,9 +1,8 @@
 ﻿using BLL.Interfaces;
 using DAL.Entities;
 using DAL.OrderManagementDBContext;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
+
 
 namespace BLL.Repos
 {
@@ -21,7 +20,7 @@ namespace BLL.Repos
 
         #region CRUD
         //Adding
-        public async Task AddAsync([FromForm] T entity)
+        public async Task AddAsync(T entity)
         {
             _context.Set<T>().Add(entity);
             await _context.SaveChangesAsync();
@@ -105,25 +104,7 @@ namespace BLL.Repos
             }
         }
 
+            #endregion
 
-        //public void SelectAllProducts(bool selectAll)
-        //{
-        //    var products = _context.Products.ToList();
-        //    foreach (var product in products)
-        //    {
-        //        product.IsSelected = selectAll;
-        //    }
-        //    _context.SaveChanges();
-        //}
-        #endregion
-
-        #region 
-
-        #endregion
-
-
-
-
-
-    }
+        }
 }

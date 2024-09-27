@@ -1,0 +1,19 @@
+﻿@model PL.Models.UploadFileViewModel
+@Html.AntiForgeryToken()
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group" enctype="multipart/form-data">
+                <label asp-for="File" class="control-label">Pick a Photo</label> 
+          
+                <div class="custom-file">
+                    <input asp-for="File" class="custom-file-input" id="customFile" />
+                    <label class="custom-file-label" for="customFile"></label>
+                </div>
+
+                <span asp-validation-for="File" class="text-danger"></span>
+        </div>
+
+
+
+
