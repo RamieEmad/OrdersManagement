@@ -3,9 +3,12 @@ using BLL.Interfaces;
 using DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using PL.Models;
 using System.Data;
+using Newtonsoft.Json;
+using System.Text;
+
+
 
 namespace PL.Controllers
 {
@@ -19,16 +22,21 @@ namespace PL.Controllers
         private readonly IGenericRepo<Product> _genericProduct;
         private readonly IWebHostEnvironment _webHost;
         private readonly IUploadFileRepo _uploadFileRepo;
+        private readonly ICartRepo _cartRepo;
+
 
 
         public ProductController
-            (IUnitOfWork unitOfWork,
+            (
+            IUnitOfWork unitOfWork,
             IMapper mapper,
             IGenericRepo<ProductCategory> genericRepo,
             ILogger<ProductController> logger,
             IGenericRepo<Product> productRepo,
             IWebHostEnvironment webHost,
-            IUploadFileRepo uploadFileRepo)
+            IUploadFileRepo uploadFileRepo,
+            ICartRepo cartRepo
+            )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -36,7 +44,8 @@ namespace PL.Controllers
             _logger = logger;
             _genericProduct = productRepo;
             _webHost = webHost;
-            _uploadFileRepo = uploadFileRepo;   
+            _uploadFileRepo = uploadFileRepo;
+            _cartRepo = cartRepo;
         }
 
         #endregion
@@ -85,7 +94,7 @@ namespace PL.Controllers
                 ProductCategoryId = productViewModel.ProductCategoryId,
                 IsActive = productViewModel.IsActive,
                 IsDeleted = productViewModel.IsDeleted,
-                
+
             };
 
             var productToAdd = _mapper.Map<Product>(product);
@@ -106,7 +115,6 @@ namespace PL.Controllers
                     }
 
                     // Save the file to the images directory
-                        
                     string filePath = Path.Combine(imagesDir, uploadFileViewModel.File.FileName);
 
                     // Get the relative path from the web root path to the file path
@@ -119,14 +127,31 @@ namespace PL.Controllers
                     // Create a new UploadFile entity
                     UploadFile uploadFile = new UploadFile
                     {
-                        ProductId = productToAdd.Id, 
+                        ProductId = productToAdd.Id,
                         ImageUrl = $"/{relativePath}",/*$"/Product/Images/{Guid.NewGuid()}{uploadFileViewModel.File.FileName}",*/
                         FileName = uploadFileViewModel.File.FileName,
-                        ContentType =  Path.GetExtension(uploadFileViewModel.File.FileName).ToLower()
+                        ContentType = Path.GetExtension(uploadFileViewModel.File.FileName).ToLower()
                     };
+
+                    string GetUniqueFileName(string filePath)
+                    {
+                        string fileName = Path.GetFileName(filePath);
+                        string fileExtension = Path.GetExtension(filePath);
+                        string directoryPath = Path.GetDirectoryName(filePath);
+
+                        int counter = 1;
+                        while (uploadFileViewModel.File != null && System.IO.File.Exists(filePath))
+                        {
+                            fileName = $"{Path.GetFileNameWithoutExtension(fileName)}_{counter}{fileExtension}";
+                            filePath = Path.Combine(directoryPath, fileName);
+                            counter++;
+                        }
+                        return filePath;
+                    }
 
                     //saving
                     await _unitOfWork.UploadFileRepo.AddAsync(uploadFile);
+
 
                 }
             }
@@ -134,11 +159,11 @@ namespace PL.Controllers
 
             return Redirect("~/Product/List");
 
-        } 
-            #endregion
-        
+        }
+        #endregion
+
         #region Delete & Confirmation & Delete int-Array
-            [HttpGet]
+        [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
             var getByIdProduct = await _genericProduct.GetByIdAsync(id);
@@ -195,7 +220,7 @@ namespace PL.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(int id, [FromForm] ProductViewModel viewModel, [FromForm]UploadFileViewModel uploadFileViewModel)
+        public async Task<IActionResult> Update(int id, [FromForm] ProductViewModel viewModel, [FromForm] UploadFileViewModel uploadFileViewModel)
         {
             if (id != viewModel.Id)
             {
@@ -208,8 +233,8 @@ namespace PL.Controllers
                 return NotFound("Product not found");
             }
 
-                var updatedProduct = _mapper.Map(viewModel, product);
-                await _genericProduct.UpdateAsync(updatedProduct);
+            var updatedProduct = _mapper.Map(viewModel, product);
+            await _genericProduct.UpdateAsync(updatedProduct);
 
             #region Upload-File
             if (uploadFileViewModel != null && uploadFileViewModel.File.Length > 0)
@@ -284,7 +309,7 @@ namespace PL.Controllers
 
         #region LIST & GET
         [HttpGet]
-        public ActionResult List(string sortOrder, string searchString, int? pageNumber= 1)
+        public ActionResult List([FromForm] string sortOrder, string searchString, int? pageNumber = 1)
         {
             #region ViewData & ProductListWithCategory
 
@@ -331,7 +356,7 @@ namespace PL.Controllers
 
             #region Pagination & Foreach-ToShowImage
             int pageSize = 5;
-            
+
             var productViewModels = _mapper.Map<List<ProductViewModel>>(getAllProduct);
 
             // Retrieve the uploaded files for each product
@@ -414,7 +439,99 @@ namespace PL.Controllers
         }
 
         #endregion
+
+        #region Marketplace
+        public async Task<IActionResult> Marketplace([FromForm] string searchString, int? pageNumber = 1)
+        {
+            ViewData["CurrentFilter"] = searchString;
+
+            int pageSize = 5;
+            var getAllProduct =  _unitOfWork.ProductRepo.GetAllProductWithCategory();
+
+            #region Searching
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                getAllProduct = getAllProduct.Where(p => p.prodName.Contains(searchString));
+            }
+            #endregion
+
+            var productViewModels = _mapper.Map<List<ProductViewModel>>(getAllProduct);
+
+            // Retrieve the uploaded files for each product
+            foreach (var productViewModel in productViewModels)
+            {
+                var uploadFiles = _unitOfWork.UploadFileRepo.GetUploadFilesByProductId(productViewModel.Id).Result;
+                var uploadFileViewModels = _mapper.Map<List<UploadFileViewModel>>(uploadFiles);
+                productViewModel.UploadFilesViewModel = uploadFileViewModels;
+            }
+
+            return View(PaginatedList<ProductViewModel>.Create(productViewModels,
+                   pageNumber ?? 1, pageSize));
+
+        }
+        #endregion
+
+        #region AddtoShoppingCart
+        
+        public IActionResult AddToCart(int id)
+        {
+            var product = _unitOfWork.ProductRepo.ProductWithRelations(id);
+            if (product == null) return Json(new { success = false, message = "Product not found." });
+
+            var viewModel = new ProductViewModel
+            {
+                Id = product.Id,
+                prodName = product.prodName,
+                prodDesc = product.prodDesc,
+                IsActive = product.IsActive,
+                ProductCategory = new ProductCategory
+                {
+                    Id = product.ProductCategory.Id,
+                    categoryName = product.ProductCategory.categoryName,
+                },
+                ProductPriceHistories = product.ProductPriceHistories.Select(pph => new ProductPriceHistoryViewModel { Price = pph.Price }),
+                UploadFilesViewModel = product.UploadFiles.Select(uf => new UploadFileViewModel { ImageUrl = uf.ImageUrl }).ToList(),
+            };
+
+
+            var json = JsonConvert.SerializeObject(viewModel);
+            var bytes = Encoding.UTF8.GetBytes(json);
+
+            // Store the byte array in session
+            HttpContext.Session.SetString("ProductToCart", Convert.ToBase64String(bytes));
+
+            //return Json(new { success = true, message = "Product added to cart successfully!" });
+            return RedirectToAction("ShoppingCart");
+        }
+
+
+        [HttpPost]
+        public IActionResult ShoppingCart()
+        {
+            // Retrieve the base64-encoded string from the session
+            var serializedProduct = HttpContext.Session.GetString("ProductToCart");
+
+            // Check if the serializedProduct is null or empty before deserialization
+            if (string.IsNullOrEmpty(serializedProduct))
+            {
+              
+                return View(); // Return a view indicating the cart is empty "PatialView"
+            }
+
+            // Decode the Base64 string
+            var decodedBytes = Convert.FromBase64String(serializedProduct);
+            var json = Encoding.UTF8.GetString(decodedBytes);
+
+                // Deserialize the string back into a ProductViewModel object
+                var product = JsonConvert.DeserializeObject<ProductViewModel>(json);
+                return View(product);
+
+        }   
+        #endregion
     }
 }
+   
+
+
 
 

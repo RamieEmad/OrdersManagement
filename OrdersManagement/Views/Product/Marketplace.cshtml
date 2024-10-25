@@ -1,0 +1,92 @@
+﻿@using DAL.Entities
+@using PL.Models;
+@using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Mvc.TagHelpers;
+@model PaginatedList<PL.Models.ProductViewModel>
+
+@section Scripts {
+    <script src="~/css/Marketplace.css"></script>
+    <script src="~/js/AddToCart.js"> </script>
+}
+
+<h2>Marketplace</h2>
+<br />
+
+@{
+    ViewData["Title"] = "Marketplace";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@using (Html.BeginForm("Marketplace", "Product", FormMethod.Get))
+{
+    <p>
+        Find
+        @Html.TextBox("SearchString", ViewData["CurrentFilter"] as string, new { @class = "search-box", style = "width: 1135px;", @placeholder = "What's in your mind?" })
+        <button type="submit" class="search-button" value="Search">Search</button>
+    </p>
+}
+
+
+<div class="product-cards">
+@foreach(var item in Model)
+{
+
+        <div class="product-card"> 
+            <region --Retrieve Image--> 
+                @if (item.UploadFilesViewModel != null && item.UploadFilesViewModel.Any())
+                {
+                    @foreach (var uploadFile in item.UploadFilesViewModel)
+                    {
+                <a href="@uploadFile.ImageUrl" target="_blank">
+                    <img src="@uploadFile.ImageUrl" alt="@uploadFile.FileName" class="product-image" width="400" height="100" />
+                </a>
+                    }
+                }
+                else
+                {
+                    <p style="color: lightcoral;">No Image</p>
+                }
+            </region>
+
+
+         <br />    
+            <Label>Name: @Html.DisplayFor(modelItem => item.prodName)</Label> <br />
+            <label> Description: Retrieve the value here</label> <br />
+            <label>Category: @Html.DisplayFor(modelItem => item.ProductCategory.categoryName)</label>
+            <p>Price: 100 EGP</p>
+
+            <details >
+                <summary>Details</summary>
+               It's a good Product Don't worry 
+            </details>
+            <br />
+
+
+            <button asp-page-handler="AddToCart" asp-route-productId="@item.Id" class="amazon-add-to-cart-button">Add to Cart</button>
+          
+
+        </div>
+ <br />
+}
+</div>
+<br />
+
+
+
+
+<region Pagination>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<div style="text-align: center;">
+    <a asp-action="Marketplace" asp-route-pageNumber="@(Model.PageIndex - 1)" class="btn btn-outline-primary @(prevDisabled)">Previous</a>
+    <a asp-action="Marketplace" asp-route-pageNumber="@(Model.PageIndex + 1)" class="btn btn-outline-primary @(nextDisabled)">Next</a>
+</div>
+
+</region>
+
+

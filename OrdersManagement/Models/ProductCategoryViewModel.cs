@@ -1,5 +1,6 @@
 ﻿using DAL.Entities;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace PL.Models
 {
@@ -11,6 +12,7 @@ namespace PL.Models
 
         [Display(Name = "Product Category")]
         public string categoryDesc { get; set; }
+        [JsonIgnore]
         public Product Products { get; set; }
     }
 }

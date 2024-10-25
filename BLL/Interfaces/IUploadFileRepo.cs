@@ -1,5 +1,4 @@
-﻿using BLL.Repos;
-using DAL.Entities;
+﻿using DAL.Entities;
 
 namespace BLL.Interfaces
 {

@@ -1,0 +1,71 @@
+﻿@model PL.Models.ProductViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    < body>
+
+
+<h1>Your Shopping Cart</h1>
+    <div class="alert alert-success">
+    <table>
+        <thead>
+
+    @if (Model != null)
+    {
+        <tr>
+            <th>
+                <h2>Product Details</h2>
+            </th>
+            <br />
+            <th>
+               @Html.DisplayNameFor(model => model.prodName)
+            </th>
+ 
+     @*        <th>
+                <strong>Description:</strong> @Model.prodDesc
+            </th>
+
+            <th>
+                <strong>Category ID:</strong> @Model.ProductCategoryId
+            </th>
+
+            <th>
+                <strong>Is Active:</strong> @(Model.IsActive ? "Yes" : "No")
+            </th> *@
+
+            </tr> 
+
+@*             <h3>Price History</h3>
+            <ul>
+                @foreach (var priceHistory in Model.ProductPriceHistories)
+                {
+                    <li>Price: @priceHistory.Price</li>
+                }
+            </ul>
+
+            <h3>Uploaded Files</h3>
+            <ul>
+                @foreach (var uploadFile in Model.UploadFilesViewModel)
+                {
+                    <li><img src="@uploadFile.ImageUrl" alt="Product Image" style="width: 100px; height: auto;" /></li>
+                }
+            </ul>  *@
+        
+    }
+    else
+    {
+        <p>No products in your shopping cart.</p>
+    }
+        </thead>
+    </table>
+    </div>
+    
+    <a href="@Url.Action("Index", "Home")">Continue Shopping</a>
+
+</html>
+

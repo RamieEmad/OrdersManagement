@@ -11,6 +11,7 @@ namespace BLL.Repos
         public IProductRepo ProductRepo { get; private set; }
         public IProductCategoryRepo ProductCategoryRepo { get; private set; }
         public IUploadFileRepo UploadFileRepo { get; private set; }
+        public ICartRepo CartRepo { get; private set; }
 
 
 

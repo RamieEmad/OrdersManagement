@@ -2,6 +2,9 @@
 using DAL.Entities;
 using DAL.OrderManagementDBContext;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
+
+
 
 namespace BLL.Repos
 {
@@ -16,7 +19,10 @@ namespace BLL.Repos
         public IEnumerable<Product> GetAllProductWithCategory()
         {
 
-            var products = _context.Products.Include(p => p.ProductCategory).Include(p => p.ProductPriceHistories).ToList();
+            var products = _context.Products.Include(p => p.ProductCategory)
+                                            .Include(p => p.ProductPriceHistories)
+                                            .Include(p => p.UploadFiles)
+                                            .ToList();
             return (products);
         }
 
@@ -47,7 +53,21 @@ namespace BLL.Repos
 
         }
 
+        public Product? ProductWithRelations(int id)
+        {
 
+            var product = _context.Products.Where(p => p.Id == id)
+                                           .Include(p => p.ProductCategory)
+                                           .Include(p => p.ProductPriceHistories)
+                                           .Include(p => p.UploadFiles)
+                                           .FirstOrDefault();
+
+
+ 
+
+            return (product);
+            
+
+        }
     }
 }
-

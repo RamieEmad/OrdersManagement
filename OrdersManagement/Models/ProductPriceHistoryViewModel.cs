@@ -16,16 +16,6 @@ namespace PL.Models
         [Required(ErrorMessage = " Please enter a value for Discount")]
         public decimal Discount { get; set; }
 
-
-        //[Required(ErrorMessage = " Please enter a value for Discount Expiry Date")]
-        //[DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
-        //public DateTime ExpiryDiscountDate { get; set; }
-
-
-
-
-
-
         public bool IsActive {  get; set; }
         
         public bool IsDeleted {  get; set; }

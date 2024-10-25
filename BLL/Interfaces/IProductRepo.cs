@@ -8,6 +8,7 @@ namespace BLL.Interfaces
         public Product GetById(int id);
         public IQueryable<Product> GetAllProductAndPricingHistory();
         public ProductPriceHistory GetActivePriceByProductId(int productId);
+        public Product? ProductWithRelations(int id);
 
 
     }

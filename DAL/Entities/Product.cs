@@ -19,5 +19,6 @@ namespace DAL.Entities
         public virtual IEnumerable<ProductPriceHistory> ProductPriceHistories { get; set; }
         public virtual IEnumerable<UploadFile> UploadFiles { get; set; }
 
+
     }
 }

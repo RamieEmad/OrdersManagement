@@ -1,0 +1,86 @@
+﻿
+.product-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.product-card {
+    border:5px solid #ccc;
+    padding: 10px;
+    text-align: center;
+    flex: 0 0 30%; /* adjust the width of each card */
+}
+
+    .product-card img {
+        max-width: 100%;
+        height: auto;
+    }
+
+
+
+
+
+
+details {
+    border: 0px solid #aaa;
+    border-radius: 4px;
+    padding: 0.5em 0.5em 0;
+}
+
+summary {
+    font-weight: bold;
+    margin: -0.5em -0.5em 0;
+    padding: 0.5em;
+}
+
+details[open] {
+    padding: 0.5em;
+}
+
+    details[open] summary {
+        border-bottom: 1px solid #aaa;
+        margin-bottom: 0.5em;
+    }
+
+
+
+.amazon-add-to-cart-button {
+    cursor: pointer;
+    border: none;
+    background-color: rgb(255, 216, 20);
+    width: 130px;
+    height: 30px;
+    border-radius: 17px;
+    transition: background-color 0.50s;
+
+}
+
+    .amazon-add-to-cart-button:hover {
+        background-color: rgb(245, 205, 3);
+    }
+
+
+
+
+
+
+.search-box {
+    /* Customize the search textbox appearance here */
+    width: 200px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.search-button {
+    /* Customize the search button appearance here */
+    background-color: cadetblue;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: grab; /* Make it look clickable */
+}
+

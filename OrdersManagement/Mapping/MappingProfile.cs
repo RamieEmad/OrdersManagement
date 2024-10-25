@@ -12,6 +12,7 @@ namespace PL.Mapping
             CreateMap<ProductCategoryViewModel, ProductCategory>().ReverseMap();
             CreateMap<ProductPriceHistoryViewModel, ProductPriceHistory>().ReverseMap();
             CreateMap<UploadFile, UploadFileViewModel>().ReverseMap();
+            CreateMap<ShoppingCartViewModel, ShoppingCart>().ReverseMap();
 
 
 

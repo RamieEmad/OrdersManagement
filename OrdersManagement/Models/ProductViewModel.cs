@@ -1,5 +1,7 @@
 ﻿using DAL.Entities;
+using Humanizer.Localisation;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace PL.Models
 {
@@ -20,17 +22,15 @@ namespace PL.Models
         
         public int ProductCategoryId { get; set; }
         public ProductCategory ProductCategory { get; set; }
+        [JsonIgnore]
         public virtual IEnumerable<ProductCategoryViewModel> ProductCategories { get; set; }
 
 
         public IEnumerable<UploadFileViewModel> UploadFilesViewModel { get; set; }
-        public virtual IEnumerable<ProductPriceHistory> PriceHistory { get; set; }
+        
+
+        public virtual IEnumerable<ProductPriceHistoryViewModel> ProductPriceHistories { get; set; }
         public ProductPriceHistory ProductPriceHistory { get; set; }
-
-
-
-
-
 
     }
 }
